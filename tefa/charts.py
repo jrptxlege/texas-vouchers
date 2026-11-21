@@ -115,7 +115,15 @@ def district_map(geojson: dict, df: pd.DataFrame, col: str, label_col: str = "la
     lo, hi = vals.min(), vals.max()
     span = (hi - lo) or 1
     fig = go.Figure()
-    for f in geojson["features"]:
+
+    def _has_hole(f):
+        g = f["geometry"]
+        polys = g["coordinates"] if g["type"] == "MultiPolygon" else [g["coordinates"]]
+        return any(len(p) > 1 for p in polys)
+
+    # Interior rings aren't cut out of the fill, so a district with a hole (e.g. HD 54
+    # around HD 55) is drawn first and the district inside it is drawn on top.
+    for f in sorted(geojson["features"], key=lambda f: not _has_hole(f)):
         did = int(f["id"])
         geom = f["geometry"]
         polys = geom["coordinates"] if geom["type"] == "MultiPolygon" else [geom["coordinates"]]

@@ -25,8 +25,10 @@ if t.empty:
     st.stop()
 
 labels = {"funded": "Funded participants", "prior_public": "Prior-year public school participants"}
-opts = [(r, m) for r, m in t[["release", "metric"]].drop_duplicates().itertuples(index=False)]
-pick = st.selectbox("Series", opts, format_func=lambda x: f"{x[0]} — {labels.get(x[1], x[1])}")
+# Plain-text options (label -> (release, metric)) so the selection survives reruns cleanly.
+series = {f"{r} — {labels.get(m, m)}": (r, m)
+          for r, m in t[["release", "metric"]].drop_duplicates().itertuples(index=False)}
+pick = series[st.selectbox("Series", list(series))]
 measure = st.radio("Measure", ["Count", "Per 1,000 enrolled students"], horizontal=True)
 n = st.slider("Show top", 10, 100, 30, step=5)
 

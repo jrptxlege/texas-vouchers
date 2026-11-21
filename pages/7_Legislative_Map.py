@@ -45,6 +45,7 @@ except Exception as e:  # noqa: BLE001
     st.stop()
 
 mem = layers.members(sdir, base, ch)
+mem_source = mem.attrs.get("source", "") if mem is not None else ""
 if mem is not None:
     df = df.merge(mem, on="district", how="left")
 df["label"] = df.district.map(lambda d: f"{'HD' if ch == 'H' else 'SD' if ch == 'S' else 'CD'} {d}")
@@ -80,7 +81,7 @@ else:
 st.plotly_chart(fig, width="stretch", key="map")
 src = "values as published by district" if layer.exact else f"crosswalk: {plan.r160.name if plan.r160 else 'n/a'} (2020 Census)"
 st.caption(f"{layer.label} — {measure.lower()}. Districts without a value are blank. {layer.note} "
-           f"Boundaries: {plan.name}; {src}.")
+           f"Boundaries: {plan.name}; {src}." + (f" Member names: {mem_source}." if mem_source else ""))
 
 cov = diag.get("share_of_total_allocated")
 m1, m2, m3 = st.columns(3)

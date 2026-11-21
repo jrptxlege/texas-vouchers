@@ -2,8 +2,6 @@
 
 Unit tests for the readers run anywhere. Data tests run against the real folder
 (TEFA_DATA_DIR or the default) and are skipped if it isn't there."""
-from pathlib import Path
-
 import numpy as np
 import pytest
 

@@ -18,7 +18,10 @@ st.write("Texas Education Freedom Accounts — applications, participants, and s
 k = ui.get("nov_kpis", base)
 if k is None:
     st.stop()
-kv = dict(zip(k.kpi, k.value))
+if k.value.isna().all():
+    st.error(f"No headline files found under {base}. Check the **Data folder** in the sidebar.")
+    st.stop()
+kv = dict(zip(k.kpi, k.value, strict=True))
 
 st.subheader("Nov 2026 dashboard: headline numbers")
 c = st.columns(4)
@@ -27,7 +30,8 @@ c[1].metric("Eligible applicants", ui.fmt_int(kv.get("Eligible applicants")))
 c[2].metric("Funded participants", ui.fmt_int(kv.get("Funded participants")))
 c[3].metric("On waiting list", ui.fmt_int(kv.get("On waiting list")))
 c = st.columns(4)
-c[0].metric("Total expenditure", f"${kv.get('Total program expenditure ($)', 0)/1e6:,.1f}M")
+spend = kv.get("Total program expenditure ($)")
+c[0].metric("Total expenditure", "—" if pd.isna(spend) else f"${spend / 1e6:,.1f}M")
 c[1].metric("Participating schools", ui.fmt_int(kv.get("Participating schools")))
 c[2].metric("Vendors with spending", ui.fmt_int(kv.get("Vendors (with spending)")))
 share = kv.get("Share of participants with a disability")
@@ -43,7 +47,7 @@ fig = go.Figure(go.Bar(x=stages.value, y=stages.stage, orientation="h", marker_c
                        hovertemplate="%{y}: %{x:,.0f}<extra></extra>"))
 fig.update_yaxes(autorange="reversed")
 fig = charts._style(fig, height=300)
-fig.update_xaxes(range=[0, stages.value.max() * 1.12])  # room for end labels
+fig.update_xaxes(range=[0, (stages.value.max() or 1) * 1.12])  # room for end labels
 fig.update_layout(title="Application funnel")
 gap = stages.value.iloc[1] - stages.value.iloc[2:].sum()
 ui.chart(fig, stages, key="funnel",

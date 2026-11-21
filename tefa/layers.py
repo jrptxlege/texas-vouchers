@@ -172,7 +172,9 @@ def members(shape_dir: Path, data_dir: Path, chamber: str) -> pd.DataFrame | Non
         df, err = D.load(_LEG_DATASET[chamber], data_dir)
         if err:
             return None
-        return df.dropna(subset=["district", "member"])[["district", "member"]].astype({"district": int, "member": str})
+        out = df.dropna(subset=["district", "member"])[["district", "member"]].astype({"district": int, "member": str})
+        out.attrs["source"] = "Nov dashboard (89th Legislature members)"
+        return out
     df = pd.read_csv(files[0])
     cols = {c.lower(): c for c in df.columns}
     dcol = next((cols[c] for c in cols if c in ("district", "dist", "district_number")), None)
@@ -184,4 +186,6 @@ def members(shape_dir: Path, data_dir: Path, chamber: str) -> pd.DataFrame | Non
         df = df[df[ccol].astype(str).str.upper().str[0] == chamber]
     out = df[[dcol, ncol]].rename(columns={dcol: "district", ncol: "member"})
     out["district"] = pd.to_numeric(out.district, errors="coerce")
-    return out.dropna(subset=["district"]).astype({"district": int}).drop_duplicates("district")
+    out = out.dropna(subset=["district"]).astype({"district": int}).drop_duplicates("district")
+    out.attrs["source"] = files[0].name
+    return out

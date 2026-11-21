@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 
 from tefa import checks, datasets as D, ui
-from tefa.readers import find_file, norm_name
+from tefa.readers import norm_name
 
 st.set_page_config(page_title="Data & QA · TEFA", layout="wide")
 base = ui.base_dir()

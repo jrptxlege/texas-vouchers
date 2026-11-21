@@ -11,24 +11,36 @@ from . import config as C
 from . import datasets as D
 
 
+def _path_box(label: str, store: str, default: str, help: str) -> str:
+    """Sidebar folder box whose value survives page changes.
+
+    Streamlit resets a widget when you switch pages (each page's widget is a new widget),
+    so the value lives under a separate, non-widget key (`store`). The widget's own key is
+    re-seeded from it on every run, and an on_change callback copies edits back before the
+    rerun. (Passing the stored value as `value=` instead makes the widget's identity depend
+    on that value, so returning to an earlier value revives that widget's stale state.)"""
+    st.session_state.setdefault(store, default)
+    wkey = f"{store}_box"
+    st.session_state[wkey] = st.session_state[store]
+
+    def _sync():
+        st.session_state[store] = st.session_state[wkey].strip()
+
+    st.sidebar.text_input(label, key=wkey, help=help, on_change=_sync)
+    return st.session_state[store]
+
+
 def base_dir() -> Path:
-    if "data_dir" not in st.session_state:
-        st.session_state.data_dir = str(C.data_dir())
-    with st.sidebar:
-        st.text_input("Data folder", key="data_dir",
-                      help="Folder holding the TEFA public files (defaults to the folder above this app).")
-        if st.button("Reload data"):
-            st.cache_data.clear()
-    return Path(st.session_state.data_dir)
+    path = _path_box("Data folder", "_data_dir", str(C.data_dir()),
+                     "Folder holding the TEFA public files (defaults to the folder above this app).")
+    if st.sidebar.button("Reload data"):
+        st.cache_data.clear()
+    return Path(path)
 
 
 def shape_dir() -> Path:
-    if "shape_dir" not in st.session_state:
-        st.session_state.shape_dir = str(C.shape_dir())
-    with st.sidebar:
-        st.text_input("Shapefile folder", key="shape_dir",
-                      help="Folder with Texas Legislative Council plan downloads (PLANH####.zip, PLANS####.zip).")
-    return Path(st.session_state.shape_dir)
+    return Path(_path_box("Shapefile folder", "_shape_dir", str(C.shape_dir()),
+                          "Folder with Texas Legislative Council plan downloads (PLANH####.zip, PLANS####.zip)."))
 
 
 @st.cache_data(show_spinner=False)

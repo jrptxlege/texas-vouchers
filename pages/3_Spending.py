@@ -27,7 +27,7 @@ with tab_s:
         st.metric("Share of school funding going to the top 10% of schools", f"{top10:.0%}")
         q = st.text_input("Find a school")
         if q:
-            st.dataframe(sch[sch.school.str.contains(q, case=False, na=False)], hide_index=True)
+            st.dataframe(sch[sch.school.str.contains(q, case=False, na=False, regex=False)], hide_index=True)
         ui.source("nov_all_schools")
 
 with tab_m:
