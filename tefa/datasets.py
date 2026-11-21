@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 
 from . import config as C
-from .readers import crosstab, find_file, numeric_cols, read_csv_any, read_raw, scalar, to_number, wide_rows
+from .readers import add_bounds, crosstab, find_file, numeric_cols, read_csv_any, read_raw, scalar, to_number, wide_rows
 
 TIDY_COLS = ["release", "dimension", "category", "metric", "value"]
 
@@ -217,16 +217,27 @@ def nov_subcategory(base: Path) -> pd.DataFrame:
     return numeric_cols(df, ["transactions", "expenditure"])
 
 
+def _with_bands(df: pd.DataFrame) -> pd.DataFrame:
+    """Full school/vendor lists publish amounts under $10,000 as $2,500 bands and
+    transaction counts under 10 as '<10'. `expenditure`/`transactions` stay exact (NaN for a
+    band); *_low/*_high give the band ends (equal for exact values); *_published keeps the text."""
+    for c in ("transactions", "expenditure"):
+        df[f"{c}_published"] = df[c].fillna("").str.strip()
+        add_bounds(df, c)
+        df[c] = df[c].map(to_number)
+    return df
+
+
 def nov_all_schools(base: Path) -> pd.DataFrame:
     df = read_csv_any(_need(base, f"{C.NOV_VEND}/All Schools.csv"))
     df.columns = ["school", "transactions", "expenditure"]
-    return numeric_cols(df, ["transactions", "expenditure"])
+    return _with_bands(df)
 
 
 def nov_all_vendors(base: Path) -> pd.DataFrame:
     df = read_csv_any(_need(base, f"{C.NOV_VEND}/All Vendors (2).csv"))
     df.columns = ["vendor", "transactions", "expenditure"]
-    return numeric_cols(df, ["transactions", "expenditure"])
+    return _with_bands(df)
 
 
 # ===================================================================== July release
@@ -416,6 +427,50 @@ def vendor_directory(base: Path) -> pd.DataFrame:
     return df
 
 
+_VENDOR_SUFFIX = r"(LLC|L L C|INC|INCORPORATED|CORP|CORPORATION|CO|COMPANY|LTD|LIMITED|PLLC|PLC|LP|LLP|PC|PA|THE|DBA)"
+
+
+def vendor_key(name) -> str:
+    """Join key for vendor names: the directory says 'ROOM FOR CHANGE, PLLC', the
+    spending list 'Room For Change Pllc'. Uppercase, drop punctuation and company suffixes."""
+    import re
+    s = str(name).upper().replace("&", " AND ")
+    s = re.sub(r"[^A-Z0-9 ]", " ", s)
+    s = re.sub(_VENDOR_SUFFIX, " ", s)
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def vendor_directory_spend(base: Path) -> pd.DataFrame:
+    """Vendor directory with each vendor's marketplace transactions and expenditure from
+    the Nov dashboard's all-vendors list. Vendors under $10,000 are published as a band, so
+    expenditure is exact or NaN; use expenditure_low/high for totals. Vendors not in the
+    list have no spending recorded (0, has_spending False).
+
+    Some vendors are registered more than once (e.g. under two business types); every row
+    of such a vendor carries the vendor's full total, so de-duplicate on `vendor_key`
+    before summing. attrs["unmatched"]: spending-list vendors not in the directory."""
+    v = vendor_directory(base)
+    a = nov_all_vendors(base)
+    v["vendor_key"] = v.vendor_name.map(vendor_key)
+    a["vendor_key"] = a.vendor.map(vendor_key)
+    cols = ["transactions", "transactions_low", "transactions_high", "transactions_published",
+            "expenditure", "expenditure_low", "expenditure_high", "expenditure_published"]
+    spend = a.drop_duplicates("vendor_key")[["vendor_key"] + cols]
+    out = v.merge(spend, on="vendor_key", how="left")
+    out["has_spending"] = out.expenditure_high.notna()
+    none = ~out.has_spending  # not in the spending list: no marketplace spending recorded
+    out.loc[none, ["transactions", "transactions_low", "transactions_high",
+                   "expenditure", "expenditure_low", "expenditure_high"]] = 0.0
+    out.loc[none, ["transactions_published", "expenditure_published"]] = ""
+    # Plain records (not a DataFrame): attrs travel with every slice and must stay JSON-able.
+    um = a[~a.vendor_key.isin(set(v.vendor_key))].sort_values("expenditure_high", ascending=False)
+    out.attrs["unmatched"] = [{"vendor": r.vendor, "expenditure": r.expenditure_published}
+                              for r in um.itertuples()]
+    out.attrs["spend_low"] = float(a.expenditure_low.sum())
+    out.attrs["spend_high"] = float(a.expenditure_high.sum())
+    return out
+
+
 def sped_by_code(base: Path) -> pd.DataFrame:
     raw = read_raw(_need(base, "TEFA_SpecialEd_Funding_by_Code_2026-27.xlsx"), "By Code")
     hdr = raw.index[raw.iloc[:, 0].astype(str).str.strip() == "Code"][0]
@@ -521,6 +576,9 @@ DATASETS: list[Dataset] = [
     Dataset("esc_regions", "Education service center regions", "Reference", esc_regions, "ESC2024.csv",
             "Region number, headquarters city and website (Texas Shapefiles folder)."),
     Dataset("vendor_directory", "Participating vendor directory", "Reference", vendor_directory, "TEFA-Participating-Vendors.xlsx"),
+    Dataset("vendor_directory_spend", "Vendor directory with marketplace spending", "Reference", vendor_directory_spend,
+            "TEFA-Participating-Vendors.xlsx + Vendors/All Vendors (2).csv",
+            "Spending joined by vendor name; vendors not in the spending list show $0."),
     Dataset("sped_by_code", "SPED add-on by IEP instructional code", "Special education", sped_by_code, "TEFA_SpecialEd_Funding_by_Code_2026-27.xlsx"),
     Dataset("sped_district_table", "SPED add-on by district and code", "Special education", sped_district_table, "TEFA_SpecialEd_Funding_by_Code_2026-27.xlsx"),
 ]

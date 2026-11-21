@@ -29,6 +29,17 @@ def _row(name, a_lab, a, b_lab, b, note=""):
             "pct_difference": pct, "status": status, "a": a_lab, "b": b_lab, "note": note}
 
 
+def _band_row(name, a_lab, df, col, b_lab, b):
+    """Compare a list total with a tile when some rows are published as bands: 'ok' when the
+    tile falls inside [sum of band lows, sum of band highs] (or within tolerance of an end)."""
+    lo, hi = df[f"{col}_low"].sum(), df[f"{col}_high"].sum()
+    mid = (lo + hi) / 2
+    row = _row(name, a_lab, mid, b_lab, b, f"range {lo:,.0f}–{hi:,.0f}" if hi > lo else "")
+    if not np.isnan(b) and lo * (1 - TOL) <= b <= hi * (1 + TOL):
+        row["status"] = "ok"
+    return row
+
+
 def run_checks(base: Path) -> pd.DataFrame:
     out = []
     kpis, _ = D.load("nov_kpis", base)
@@ -66,14 +77,14 @@ def run_checks(base: Path) -> pd.DataFrame:
                 out.append(_row(f"{D.BY_ID[ds].title}: total", ds, df.expenditure.sum(), "Marketplace Spend", mkt))
         al, _ = D.load("nov_all_vendors", base)
         if al is not None:
-            out.append(_row("All vendors CSV: total expenditure", "All Vendors (2).csv", al.expenditure.sum(), "Marketplace Spend", mkt))
+            out.append(_band_row("All vendors CSV: total expenditure", "All Vendors (2).csv", al, "expenditure", "Marketplace Spend", mkt))
             out.append(_row("All vendors CSV: vendor count", "All Vendors (2).csv", float(len(al)), "Vendors tile", k.get("Vendors (with spending)", np.nan)))
-            out.append(_row("All vendors CSV: transactions", "All Vendors (2).csv", al.transactions.sum(), "Vendor transactions tile", k.get("Vendor transactions", np.nan)))
+            out.append(_band_row("All vendors CSV: transactions", "All Vendors (2).csv", al, "transactions", "Vendor transactions tile", k.get("Vendor transactions", np.nan)))
         sch, _ = D.load("nov_all_schools", base)
         if sch is not None:
-            out.append(_row("All schools CSV: total expenditure", "All Schools.csv", sch.expenditure.sum(), "School Funding", fa_d.get("School Funding", np.nan)))
+            out.append(_band_row("All schools CSV: total expenditure", "All Schools.csv", sch, "expenditure", "School Funding", fa_d.get("School Funding", np.nan)))
             out.append(_row("All schools CSV: school count", "All Schools.csv", float(len(sch)), "Participating schools tile", k.get("Participating schools", np.nan)))
-            out.append(_row("All schools CSV: transactions", "All Schools.csv", sch.transactions.sum(), "School transactions tile", k.get("School transactions", np.nan)))
+            out.append(_band_row("All schools CSV: transactions", "All Schools.csv", sch, "transactions", "School transactions tile", k.get("School transactions", np.nan)))
 
     # Top-N exports vs full lists, entity by entity
     for top_id, all_id, key in [("nov_top_vendors", "nov_all_vendors", "vendor"), ("nov_top_schools", "nov_all_schools", "school")]:

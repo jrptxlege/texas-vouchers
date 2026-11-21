@@ -67,6 +67,31 @@ def to_number(x):
     return -v if neg else v
 
 
+def to_bounds(x) -> tuple[float, float]:
+    """Published value -> (low, high). Exact numbers give (v, v); the dashboard's bands
+    give their ends: '$2,501-5,000' -> (2501, 5000), '<10' -> (0, 9). Unreadable -> NaNs.
+    ('$2.501-5,000' appears in one export; a '.' before three digits is a thousands mark.)"""
+    v = to_number(x)
+    if not np.isnan(v):
+        return v, v
+    s = re.sub(r"(?<=\d)\.(?=\d{3}\b)", ",", str(x).strip())
+    m = re.fullmatch(r"\$?\s*([\d,]+(?:\.\d+)?)\s*[-–]\s*\$?\s*([\d,]+(?:\.\d+)?)", s)
+    if m:
+        return to_number(m.group(1)), to_number(m.group(2))
+    m = re.fullmatch(r"<\s*\$?\s*([\d,]+)", s)
+    if m:
+        return 0.0, to_number(m.group(1)) - 1
+    return np.nan, np.nan
+
+
+def add_bounds(df: pd.DataFrame, col: str) -> pd.DataFrame:
+    """Keep `col` exact (NaN for bands) and add col_low / col_high from the published text."""
+    b = df[col].map(to_bounds)
+    df[f"{col}_low"] = b.str[0]
+    df[f"{col}_high"] = b.str[1]
+    return df
+
+
 def numeric_cols(df: pd.DataFrame, cols) -> pd.DataFrame:
     df = df.copy()
     for c in cols:

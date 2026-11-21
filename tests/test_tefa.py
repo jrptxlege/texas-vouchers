@@ -342,3 +342,29 @@ def test_tooltips_have_labels(monkeypatch):
             if ht.startswith("=") or ">=" in ht or "<br>=" in ht:
                 bad.setdefault(page, []).append(ht)
     assert n > 10 and not bad, bad
+
+
+# ------------------------------------------------------------------- vendor spending
+def test_to_bounds():
+    from tefa.readers import to_bounds
+    assert to_bounds("$12,267,200") == (12267200, 12267200)
+    assert to_bounds("$0-2,500") == (0, 2500)
+    assert to_bounds("$2.501-5,000") == (2501, 5000)  # typo in the schools export
+    assert to_bounds("<10") == (0, 9)
+    assert all(np.isnan(to_bounds("")))
+
+
+@needs_bundle
+def test_vendor_directory_spend():
+    df, err = D.load("vendor_directory_spend", config.BUNDLE_DIR)
+    assert err is None
+    full, _ = D.load("nov_all_vendors", config.BUNDLE_DIR)
+    assert full.expenditure_low.notna().all(), "every published amount (exact or band) must parse"
+    u = df.drop_duplicates("vendor_key")
+    unmatched = df.attrs["unmatched"]
+    assert u.has_spending.sum() + len(unmatched) == len(full)  # every spending row lands somewhere once
+    assert [r["vendor"] for r in unmatched][:1] == ["Amazon"]
+    # directory share + unmatched == the list's band totals
+    assert abs(u.expenditure_low.sum() - full[full.vendor.isin([r["vendor"] for r in unmatched]) == False]
+               .expenditure_low.sum()) < 1
+    assert (df.expenditure_low <= df.expenditure_high).all()
