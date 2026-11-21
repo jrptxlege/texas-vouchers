@@ -1,8 +1,8 @@
-streamlit>=1.40
-pandas>=2.0
-openpyxl>=3.1
-xlrd>=2.0          # Legislative Council .xls reports
-plotly>=5.24
-geopandas>=0.14    # reads the PLANH/PLANS shapefiles (only needed for the map page)
-pyogrio>=0.7
-pytest>=8.0
+# What the app needs to run, including when hosted (Streamlit Community Cloud etc.).
+# The hosted app reads the bundled snapshot in data/, so it needs no geopandas or xlrd.
+# Version ranges are the major versions this was tested with (Python 3.13 / 3.14).
+streamlit>=1.50,<2
+pandas>=3.0,<4
+numpy>=2.1,<3
+openpyxl>=3.1,<4
+plotly>=6.0,<8

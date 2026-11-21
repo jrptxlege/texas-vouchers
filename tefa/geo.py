@@ -9,6 +9,12 @@ Inputs (Texas Legislative Council "all files" downloads, in the shapefile folder
 The newest plan zip in the folder is used, and the newest school-year Red-160 for that
 plan, so dropping in a new TLC download upgrades the app without code changes.
 A Congressional layer appears automatically if a PLANC####.zip shapefile is added.
+
+Pre-built files (for hosting, where the TLC downloads aren't available): the same folder
+may instead hold, per plan, `PLANH####.geojson` (simplified WGS84 boundaries) and
+`PLANH####_isd_crosswalk.csv` (the parsed Red-160 report), written by
+scripts/build_bundle.py. Those need neither geopandas nor xlrd. If both a zip and
+pre-built files exist for a chamber, the newer plan number wins (zip on a tie).
 """
 from __future__ import annotations
 
@@ -28,25 +34,58 @@ SIMPLIFY_METERS = 150  # boundary simplification for web maps; 0 keeps full deta
 
 @dataclass(frozen=True)
 class Plan:
-    chamber: str        # "H" | "S" | "C"
-    name: str           # e.g. "PLANH2316"
-    shapefile_zip: Path
-    r160: Path | None   # ISD crosswalk report, if present
+    chamber: str                    # "H" | "S" | "C"
+    name: str                       # e.g. "PLANH2316"
+    shapefile_zip: Path | None      # TLC download (needs geopandas), or None when pre-built
+    r160: Path | None               # Red-160 ISD report (.xls), if present
     school_year: str | None
+    geojson: Path | None = None     # pre-built boundaries
+    crosswalk_csv: Path | None = None  # pre-built parsed Red-160
+
+    @property
+    def crosswalk_source(self) -> str:
+        p = self.r160 or self.crosswalk_csv
+        return p.name if p else "n/a"
+
+
+PREBUILT_GEOJSON = "{name}.geojson"
+PREBUILT_CROSSWALK = "{name}_isd_crosswalk.csv"
+PREBUILT_META = "{name}_meta.json"
 
 
 def _plan_zips(shape_dir: Path) -> list[Path]:
     return [p for p in shape_dir.rglob("*.zip") if re.fullmatch(r"PLAN[HSC]\d+\.zip", p.name, re.I)]
 
 
+def _plan_num(name: str) -> int:
+    return int(re.sub(r"\D", "", name) or 0)
+
+
+def _prebuilt_plans(shape_dir: Path) -> list[Plan]:
+    out = []
+    for g in shape_dir.glob("PLAN*.geojson"):
+        name = g.stem.upper()
+        if not re.fullmatch(r"PLAN[HSC]\d+", name):
+            continue
+        xw = g.with_name(PREBUILT_CROSSWALK.format(name=g.stem))
+        meta = g.with_name(PREBUILT_META.format(name=g.stem))
+        sy = json.loads(meta.read_text()).get("school_year") if meta.exists() else None
+        out.append(Plan(name[4], name, None, None, sy, geojson=g, crosswalk_csv=xw if xw.exists() else None))
+    return out
+
+
 def find_plans(shape_dir: Path) -> dict[str, Plan]:
-    """Latest plan per chamber found under shape_dir."""
+    """Latest plan per chamber found under shape_dir (TLC zips or pre-built files)."""
     out: dict[str, Plan] = {}
     if not shape_dir.exists():
         return out
+    for p in sorted(_prebuilt_plans(shape_dir), key=lambda p: _plan_num(p.name)):
+        out[p.chamber] = p
     for z in sorted(_plan_zips(shape_dir), key=lambda p: p.stat().st_mtime):
         name = z.stem.upper()
         ch = name[4]
+        if ch in out and _plan_num(out[ch].name) > _plan_num(name):
+            continue  # a newer pre-built plan is already there
         reports = [(m.group(1), p) for p in z.parent.glob(f"{z.stem}*r160*ISDs*SY*.xls*")
                    if (m := re.search(r"SY(\d{2}-\d{2})", p.name))]
         sy, r160 = max(reports) if reports else (None, None)
@@ -65,6 +104,8 @@ def boundaries_geojson(plan: Plan) -> dict:
     """District polygons as WGS84 GeoJSON (cached next to the app; rebuilt if the zip changes).
 
     Feature id = district number (int), so choropleths join on it directly."""
+    if plan.geojson is not None:
+        return json.loads(plan.geojson.read_text(encoding="utf-8"))
     stamp = int(plan.shapefile_zip.stat().st_mtime)
     cache = _cache_dir() / f"{plan.name}_{stamp}_s{SIMPLIFY_METERS}.geojson"
     if cache.exists():
@@ -121,7 +162,10 @@ def read_r160(path: Path) -> pd.DataFrame:
 
 @lru_cache(maxsize=8)
 def _crosswalk_cached(path: str, mtime: float) -> pd.DataFrame:
-    return read_r160(Path(path))
+    p = Path(path)
+    if p.suffix.lower() == ".csv":
+        return pd.read_csv(p, dtype={"isd": str})
+    return read_r160(p)
 
 
 def crosswalk(plan: Plan) -> pd.DataFrame:
@@ -130,9 +174,10 @@ def crosswalk(plan: Plan) -> pd.DataFrame:
     w_u18 = this piece's share of the ISD's under-18 population (default weight — the
     closest Census proxy for where students live); w_pop = share of total population.
     Each ISD's weights sum to 1 across districts."""
-    if plan.r160 is None:
-        raise FileNotFoundError(f"No r160 ISD report next to {plan.shapefile_zip.name}")
-    df = _crosswalk_cached(str(plan.r160), plan.r160.stat().st_mtime).copy()
+    src = plan.r160 or plan.crosswalk_csv
+    if src is None:
+        raise FileNotFoundError(f"No ISD crosswalk (Red-160 report or pre-built CSV) for {plan.name}")
+    df = _crosswalk_cached(str(src), src.stat().st_mtime).copy()
     from .districts import key, _clean
     names = df.isd.map(lambda n: _clean(re.sub(r"\s*\(.*\)$", "", n)))
     dups = set(names[df.isd.str.contains(r"\(")])  # TLC qualifies duplicate names with (County)

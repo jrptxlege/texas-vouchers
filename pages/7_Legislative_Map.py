@@ -79,7 +79,7 @@ else:
     fig = charts.district_map(_geo(plan), df, col, hover_cols=extra, money=layer.kind == "money",
                               bounds=charts.FOCUS[focus])
 st.plotly_chart(fig, width="stretch", key="map")
-src = "values as published by district" if layer.exact else f"crosswalk: {plan.r160.name if plan.r160 else 'n/a'} (2020 Census)"
+src = "values as published by district" if layer.exact else f"crosswalk: {plan.crosswalk_source} (2020 Census)"
 st.caption(f"{layer.label} — {measure.lower()}. Districts without a value are blank. {layer.note} "
            f"Boundaries: {plan.name}; {src}." + (f" Member names: {mem_source}." if mem_source else ""))
 

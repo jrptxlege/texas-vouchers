@@ -22,8 +22,15 @@ known = {norm_name(rel.split("/")[-1]) for rel in D.NOV_KPI_FILES.values()}
 for d in D.DATASETS:
     for part in str(d.source).split(" / "):
         known.add(norm_name(part.split("/")[-1]))
+def _skip(p):
+    """The app's own folder (when it sits inside the data folder) and the bundle's map files."""
+    rel = p.relative_to(base)
+    return p.resolve().is_relative_to(ui.C.APP_DIR) and not base.resolve().is_relative_to(ui.C.APP_DIR) \
+        or rel.parts[0] == "geo"
+
+
 files = [p for p in base.rglob("*") if p.is_file() and p.suffix.lower() in {".xlsx", ".csv", ".pdf"}
-         and "tefa_viz" not in p.parts]
+         and not _skip(p)]
 unread = [str(p.relative_to(base)) for p in files if norm_name(p.name) not in known]
 with st.expander(f"{len(unread)} file(s) in the folder not read by any loader"):
     st.write("PDFs are source documents; new spreadsheets here likely need a loader in tefa/datasets.py.")

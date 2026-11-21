@@ -2,3 +2,5 @@
 *.py text eol=lf
 *.md text eol=lf
 *.bat text eol=crlf
+data/** -text
+*.geojson -diff

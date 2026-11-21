@@ -9,3 +9,6 @@ __pycache__/
 .env
 .claude/skills/
 .agents/
+
+# The bundled snapshot is committed on purpose (scripts/build_bundle.py writes it).
+!data/**

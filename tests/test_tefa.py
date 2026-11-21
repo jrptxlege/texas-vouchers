@@ -130,3 +130,61 @@ def test_oct1_district():
     tot = D.oct1_totals(BASE)
     assert df.funded.sum() == tot["in_listed_isds"]
     assert tot["in_listed_isds"] + tot["in_isds_under_30"] == tot["total_reported"]
+
+
+# ------------------------------------------------------------------ bundled snapshot
+BUNDLE_MANIFEST = config.BUNDLE_DIR / "MANIFEST.json"
+needs_bundle = pytest.mark.skipif(not BUNDLE_MANIFEST.exists(), reason="no bundled snapshot (data/)")
+
+
+@needs_bundle
+def test_bundle_files_match_manifest():
+    import hashlib
+    import json
+    m = json.loads(BUNDLE_MANIFEST.read_text(encoding="utf-8"))
+    for f in m["files"]:
+        p = config.BUNDLE_DIR / f["path"]
+        assert p.exists(), f["path"]
+        assert hashlib.sha256(p.read_bytes()).hexdigest() == f["sha256"], f"{f['path']} changed by hand"
+
+
+@needs_bundle
+def test_bundle_runs_without_geo_libraries():
+    """What a hosted copy does: read data/ only, with geopandas/xlrd not installed."""
+    import subprocess
+    import sys
+    code = """
+import sys
+for m in ("geopandas", "xlrd", "pyogrio"):
+    sys.modules[m] = None
+from tefa import config as C, datasets as D, geo, layers
+assert C.data_dir() == C.BUNDLE_DIR and C.shape_dir() == C.BUNDLE_GEO_DIR
+bad = [d.id for d in D.DATASETS if D.load(d.id, C.data_dir())[1]]
+assert not bad, bad
+plans = geo.find_plans(C.shape_dir())
+assert set(plans) == {"H", "S", "C"}, plans
+for ch, p in plans.items():
+    assert len(geo.boundaries_geojson(p)["features"]) == {"H": 150, "S": 31, "C": 38}[ch]
+    for l in layers.LAYERS:
+        if l.exact and ch == "C":
+            continue
+        df, _ = layers.build(l.id, C.data_dir(), p)
+        assert df.value.notna().any(), (ch, l.id)
+print("ok")
+"""
+    env = {**__import__("os").environ, "TEFA_USE_BUNDLE": "1"}
+    env.pop("TEFA_DATA_DIR", None)
+    env.pop("TEFA_SHAPE_DIR", None)
+    r = subprocess.run([sys.executable, "-c", code], cwd=config.APP_DIR, env=env, capture_output=True, text=True)
+    assert r.returncode == 0 and r.stdout.strip().endswith("ok"), r.stderr[-2000:]
+
+
+@needs_bundle
+@pytest.mark.skipif(not (config.DEFAULT_DATA_DIR / config.NOV_DIR).exists(), reason="live folder not present")
+def test_bundle_is_up_to_date():
+    """Fails when the live files changed since the last bundle: run scripts/build_bundle.py."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("build_bundle", config.APP_DIR / "scripts" / "build_bundle.py")
+    bb = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(bb)
+    assert bb.check(config.DEFAULT_DATA_DIR) == [], "Bundle is stale - run: python scripts/build_bundle.py"

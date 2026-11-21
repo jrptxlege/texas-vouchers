@@ -1,0 +1,327 @@
+{
+ "built": "2026-11-21T07:18:06-06:00",
+ "source_data_dir": "TEFA Public Data",
+ "source_shape_dir": "Texas Shapefiles",
+ "plans": {
+  "C": "PLANC2333",
+  "H": "PLANH2316",
+  "S": "PLANS2168"
+ },
+ "source_hashes": {
+  "Nov.26-Dashboard/Applicants by Income.xlsx": "fd01f51c69cf122c56dc024b4407d4bcac5a2baf584ace42ad2fa44153631e81",
+  "Nov.26-Dashboard/Applicants on Waiting List.xlsx": "6e541bdfe5bb527159ebc5ecdd7a61cbac91adb88441faced0e6ce1b684622b5",
+  "Nov.26-Dashboard/Applicants Opted Out.csv": "ee83f16f646e22c9f05d731e20a89fdae148f958ac683f09649b0a6d8ac1c472",
+  "Nov.26-Dashboard/Applicants With Disabilities.xlsx": "345e9107e033c54e065c004e267a0c3385347eea00a5b1df8140a557591b685c",
+  "Nov.26-Dashboard/Applications Received.xlsx": "90912b308a6a862b54fe9f76abbcfea23ece005cf223bda689634bf9e74208e8",
+  "Nov.26-Dashboard/Eligible Applicants.xlsx": "3621c6c0136969e19fc6223147c31e15e13f897c08884e47cc05b7c9ebce09ab",
+  "Nov.26-Dashboard/Expenditures/Funding Allocation.xlsx": "dfe8880b94705e07258cd1f0180279ce4711117ff18895ac0480f466237d3ad4",
+  "Nov.26-Dashboard/Expenditures/Participating Schools.xlsx": "6aedde0e20f8b8b8be5b082670b446403dfa7d58337282bb6a28d7d3d230247c",
+  "Nov.26-Dashboard/Expenditures/School Transactions.xlsx": "6d818b3a5ba09fc538e44e714b10c090a6fb7564bc6d576fd17d4931cc239aeb",
+  "Nov.26-Dashboard/Expenditures/Top 20 Schools by Expenditure or Transactions.xlsx": "13aff2f77a9aa52d440bc0e2b826d4294463cb47eb66e64b45d2a504c85c48d9",
+  "Nov.26-Dashboard/Expenditures/Top 20 Sub Categories by Expenditure or Transactions.xlsx": "b899cb6dc17a8c85fb1233bf0136a242684bbb3d8c6defbb7d93a16e15d55ae0",
+  "Nov.26-Dashboard/Expenditures/Top 20 Vendors by Expenditure or Transactions.xlsx": "e57c2e214974ef53870ea6d00f3e48ecc490c641bc249aa11ebc9a64afcf1176",
+  "Nov.26-Dashboard/Expenditures/Tuition Total Expenditure.xlsx": "bed287bd3621f4f348fd54c4f79b0ec09b89d55bd26278e12859a6d93f27efc8",
+  "Nov.26-Dashboard/Expenditures/Vendor Distribution by Expenditure.xlsx": "5078999f668b0a6f384574936881725abe2199bf2a5fe49a9fa5fad101a43573",
+  "Nov.26-Dashboard/Expenditures/Vendor Transactions.xlsx": "05d864dc83bf9f07c5a60235cdbd83b6fe554c3cb99bf60915f711e3042150b9",
+  "Nov.26-Dashboard/Expenditures/Vendors.xlsx": "48945cf9ee9e602982ad6fc171f36441f43b455335b3b193b423ff7ae415971f",
+  "Nov.26-Dashboard/Funded Participants  by Race_Ethnicity.xlsx": "e0d7778b1f6b9117451bec5fbf325bc75aeaba822ebd10793aacb79f2b66519e",
+  "Nov.26-Dashboard/Funded Participants by Age.xlsx": "60deadff2bb3250227e7c2f96667ac7ac890e4e1bdcd2c3abe1f5a0e32edf4dd",
+  "Nov.26-Dashboard/Funded Participants by Gender.xlsx": "91618d57c5a69dfcd7f691d8a6051991206d8a5bf8b72c135c0fe5da16a6bc26",
+  "Nov.26-Dashboard/Funded Participants by House Districts.xlsx": "a02ee9a7b09f98498f457389c7fdde91e12da7619f00ca52a74fe9545c0fa768",
+  "Nov.26-Dashboard/Funded Participants by Senate Districts.xlsx": "5fd51f1cadf89432ffef8c78ca8a01f359a6eefd9bd9e206ffa50ea77f93d79f",
+  "Nov.26-Dashboard/Funded Participants.xlsx": "e31899e12982bb76c3109e1c9c4619e84b4e237a279c08bff74e35b0e7ef1f47",
+  "Nov.26-Dashboard/ISD Participation Heat Map.xlsx": "6a42e78d87b71e5d5d8c875eabac1862b6c04f98b8be623a2dd53c96184c6b81",
+  "Nov.26-Dashboard/Low Income Funded Participants.xlsx": "b832bf73d2bf15ca55172c66e7ed93a310f65846e6c8c78b56d7f5b0a96a5b7c",
+  "Nov.26-Dashboard/Particiapts With Disability.xlsx": "6b88e6d8c8ddeef03c56c6fa76f23295b536b24e2b7c1264120f87286768e0da",
+  "Nov.26-Dashboard/Participants by Grade level.xlsx": "42d1622c9d4fbdf4ce28ced3b733f5e31aaa4683e58122c8bf2c011c15208c0b",
+  "Nov.26-Dashboard/Participation by Priority Tier.xlsx": "a1686f4eefc611b2f047bbc1540b7660adc468ec3c3930edbb0c019e8959c004",
+  "Nov.26-Dashboard/Prior Year Public School Participation.xlsx": "f46e9a85af6ce9ba62ca3c3bb4c75a3904bd5fe1d8fa01d73127276196639484",
+  "Nov.26-Dashboard/Vendors/All Schools.csv": "164d931beed5d5b8ed0fb8de8c9edcf6e2ab6d8d07b59260c815ef670ab01b35",
+  "Nov.26-Dashboard/Vendors/All Vendors (2).csv": "d978c6dbf0db623919770d868fcd8033c9f89e977fde91965053c2d8b779ce93",
+  "Nov.26-Dashboard/Vendors/Category.xlsx": "ac4c9e1fa61d870c327e97986bf28f7747ac701b2368a1b0bf41484bfa6530aa",
+  "Nov.26-Dashboard/Vendors/Sub Category.xlsx": "1db64ed9e7119c4aed0cbecc00c4ad248ef3a30f9a03029c9a45d0c9308a98fe",
+  "Oct1_TEFA-Funded-Participants - Data\u00a0 Request.xlsx": "00963ad738258fba713c46dfb65af81a3a2b5c4eb15bd98090aa218717fffc87",
+  "TEFA-Participating-Vendors.xlsx": "4d85999e3106b81f76acdfbe429dbdca74d2a6f41132dece86e2109fdf05169d",
+  "TEFA_Data-Copy.xlsx": "8dd49c691159d657af80b00dd85b1a4b45b03c261ec95ffc13cbd0884dd00d4f",
+  "TEFA_SpecialEd_Funding_by_Code_2026-27.xlsx": "715dc647a3c7b6438d0de52be22bfb4687173874a7a4fa6bb35898a857cd996d",
+  "Voucher Data - July Release.xlsx": "4b574747288f9778add27b53a372275531f264080ed90c0804067bfdd88a7ecb"
+ },
+ "files": [
+  {
+   "path": "Nov.26-Dashboard/Applicants by Income.xlsx",
+   "source": "Nov.26-Dashboard/Applicants by Income.xlsx",
+   "bytes": 2658,
+   "sha256": "fd01f51c69cf122c56dc024b4407d4bcac5a2baf584ace42ad2fa44153631e81"
+  },
+  {
+   "path": "Nov.26-Dashboard/Applicants on Waiting List.xlsx",
+   "source": "Nov.26-Dashboard/Applicants on Waiting List.xlsx",
+   "bytes": 2154,
+   "sha256": "6e541bdfe5bb527159ebc5ecdd7a61cbac91adb88441faced0e6ce1b684622b5"
+  },
+  {
+   "path": "Nov.26-Dashboard/Applicants Opted Out.csv",
+   "source": "Nov.26-Dashboard/Applicants Opted Out.csv",
+   "bytes": 16,
+   "sha256": "ee83f16f646e22c9f05d731e20a89fdae148f958ac683f09649b0a6d8ac1c472"
+  },
+  {
+   "path": "Nov.26-Dashboard/Applicants With Disabilities.xlsx",
+   "source": "Nov.26-Dashboard/Applicants With Disabilities.xlsx",
+   "bytes": 2676,
+   "sha256": "345e9107e033c54e065c004e267a0c3385347eea00a5b1df8140a557591b685c"
+  },
+  {
+   "path": "Nov.26-Dashboard/Applications Received.xlsx",
+   "source": "Nov.26-Dashboard/Applications Received.xlsx",
+   "bytes": 2150,
+   "sha256": "90912b308a6a862b54fe9f76abbcfea23ece005cf223bda689634bf9e74208e8"
+  },
+  {
+   "path": "Nov.26-Dashboard/Eligible Applicants.xlsx",
+   "source": "Nov.26-Dashboard/Eligible Applicants.xlsx",
+   "bytes": 2155,
+   "sha256": "3621c6c0136969e19fc6223147c31e15e13f897c08884e47cc05b7c9ebce09ab"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/Funding Allocation.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/Funding Allocation.xlsx",
+   "bytes": 2765,
+   "sha256": "dfe8880b94705e07258cd1f0180279ce4711117ff18895ac0480f466237d3ad4"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/Participating Schools.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/Participating Schools.xlsx",
+   "bytes": 2145,
+   "sha256": "6aedde0e20f8b8b8be5b082670b446403dfa7d58337282bb6a28d7d3d230247c"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/School Transactions.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/School Transactions.xlsx",
+   "bytes": 2183,
+   "sha256": "6d818b3a5ba09fc538e44e714b10c090a6fb7564bc6d576fd17d4931cc239aeb"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/Top 20 Schools by Expenditure or Transactions.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/Top 20 Schools by Expenditure or Transactions.xlsx",
+   "bytes": 3261,
+   "sha256": "13aff2f77a9aa52d440bc0e2b826d4294463cb47eb66e64b45d2a504c85c48d9"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/Top 20 Sub Categories by Expenditure or Transactions.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/Top 20 Sub Categories by Expenditure or Transactions.xlsx",
+   "bytes": 3209,
+   "sha256": "b899cb6dc17a8c85fb1233bf0136a242684bbb3d8c6defbb7d93a16e15d55ae0"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/Top 20 Vendors by Expenditure or Transactions.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/Top 20 Vendors by Expenditure or Transactions.xlsx",
+   "bytes": 3296,
+   "sha256": "e57c2e214974ef53870ea6d00f3e48ecc490c641bc249aa11ebc9a64afcf1176"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/Tuition Total Expenditure.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/Tuition Total Expenditure.xlsx",
+   "bytes": 2585,
+   "sha256": "bed287bd3621f4f348fd54c4f79b0ec09b89d55bd26278e12859a6d93f27efc8"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/Vendor Distribution by Expenditure.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/Vendor Distribution by Expenditure.xlsx",
+   "bytes": 2619,
+   "sha256": "5078999f668b0a6f384574936881725abe2199bf2a5fe49a9fa5fad101a43573"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/Vendor Transactions.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/Vendor Transactions.xlsx",
+   "bytes": 2184,
+   "sha256": "05d864dc83bf9f07c5a60235cdbd83b6fe554c3cb99bf60915f711e3042150b9"
+  },
+  {
+   "path": "Nov.26-Dashboard/Expenditures/Vendors.xlsx",
+   "source": "Nov.26-Dashboard/Expenditures/Vendors.xlsx",
+   "bytes": 2144,
+   "sha256": "48945cf9ee9e602982ad6fc171f36441f43b455335b3b193b423ff7ae415971f"
+  },
+  {
+   "path": "Nov.26-Dashboard/Funded Participants by Race_Ethnicity.xlsx",
+   "source": "Nov.26-Dashboard/Funded Participants  by Race_Ethnicity.xlsx",
+   "bytes": 2724,
+   "sha256": "e0d7778b1f6b9117451bec5fbf325bc75aeaba822ebd10793aacb79f2b66519e"
+  },
+  {
+   "path": "Nov.26-Dashboard/Funded Participants by Age.xlsx",
+   "source": "Nov.26-Dashboard/Funded Participants by Age.xlsx",
+   "bytes": 2652,
+   "sha256": "60deadff2bb3250227e7c2f96667ac7ac890e4e1bdcd2c3abe1f5a0e32edf4dd"
+  },
+  {
+   "path": "Nov.26-Dashboard/Funded Participants by Gender.xlsx",
+   "source": "Nov.26-Dashboard/Funded Participants by Gender.xlsx",
+   "bytes": 2602,
+   "sha256": "91618d57c5a69dfcd7f691d8a6051991206d8a5bf8b72c135c0fe5da16a6bc26"
+  },
+  {
+   "path": "Nov.26-Dashboard/Funded Participants by House Districts.xlsx",
+   "source": "Nov.26-Dashboard/Funded Participants by House Districts.xlsx",
+   "bytes": 13213,
+   "sha256": "a02ee9a7b09f98498f457389c7fdde91e12da7619f00ca52a74fe9545c0fa768"
+  },
+  {
+   "path": "Nov.26-Dashboard/Funded Participants by Senate Districts.xlsx",
+   "source": "Nov.26-Dashboard/Funded Participants by Senate Districts.xlsx",
+   "bytes": 5072,
+   "sha256": "5fd51f1cadf89432ffef8c78ca8a01f359a6eefd9bd9e206ffa50ea77f93d79f"
+  },
+  {
+   "path": "Nov.26-Dashboard/Funded Participants.xlsx",
+   "source": "Nov.26-Dashboard/Funded Participants.xlsx",
+   "bytes": 10618,
+   "sha256": "e31899e12982bb76c3109e1c9c4619e84b4e237a279c08bff74e35b0e7ef1f47"
+  },
+  {
+   "path": "Nov.26-Dashboard/ISD Participation Heat Map.xlsx",
+   "source": "Nov.26-Dashboard/ISD Participation Heat Map.xlsx",
+   "bytes": 11712,
+   "sha256": "6a42e78d87b71e5d5d8c875eabac1862b6c04f98b8be623a2dd53c96184c6b81"
+  },
+  {
+   "path": "Nov.26-Dashboard/Low Income Funded Participants.xlsx",
+   "source": "Nov.26-Dashboard/Low Income Funded Participants.xlsx",
+   "bytes": 2153,
+   "sha256": "b832bf73d2bf15ca55172c66e7ed93a310f65846e6c8c78b56d7f5b0a96a5b7c"
+  },
+  {
+   "path": "Nov.26-Dashboard/Particiapts With Disability.xlsx",
+   "source": "Nov.26-Dashboard/Particiapts With Disability.xlsx",
+   "bytes": 2200,
+   "sha256": "6b88e6d8c8ddeef03c56c6fa76f23295b536b24e2b7c1264120f87286768e0da"
+  },
+  {
+   "path": "Nov.26-Dashboard/Participants by Grade level.xlsx",
+   "source": "Nov.26-Dashboard/Participants by Grade level.xlsx",
+   "bytes": 2860,
+   "sha256": "42d1622c9d4fbdf4ce28ced3b733f5e31aaa4683e58122c8bf2c011c15208c0b"
+  },
+  {
+   "path": "Nov.26-Dashboard/Participation by Priority Tier.xlsx",
+   "source": "Nov.26-Dashboard/Participation by Priority Tier.xlsx",
+   "bytes": 2727,
+   "sha256": "a1686f4eefc611b2f047bbc1540b7660adc468ec3c3930edbb0c019e8959c004"
+  },
+  {
+   "path": "Nov.26-Dashboard/Prior Year Public School Participation.xlsx",
+   "source": "Nov.26-Dashboard/Prior Year Public School Participation.xlsx",
+   "bytes": 11729,
+   "sha256": "f46e9a85af6ce9ba62ca3c3bb4c75a3904bd5fe1d8fa01d73127276196639484"
+  },
+  {
+   "path": "Nov.26-Dashboard/Vendors/All Schools.csv",
+   "source": "Nov.26-Dashboard/Vendors/All Schools.csv",
+   "bytes": 179574,
+   "sha256": "164d931beed5d5b8ed0fb8de8c9edcf6e2ab6d8d07b59260c815ef670ab01b35"
+  },
+  {
+   "path": "Nov.26-Dashboard/Vendors/All Vendors (2).csv",
+   "source": "Nov.26-Dashboard/Vendors/All Vendors (2).csv",
+   "bytes": 87950,
+   "sha256": "d978c6dbf0db623919770d868fcd8033c9f89e977fde91965053c2d8b779ce93"
+  },
+  {
+   "path": "Nov.26-Dashboard/Vendors/Category.xlsx",
+   "source": "Nov.26-Dashboard/Vendors/Category.xlsx",
+   "bytes": 2731,
+   "sha256": "ac4c9e1fa61d870c327e97986bf28f7747ac701b2368a1b0bf41484bfa6530aa"
+  },
+  {
+   "path": "Nov.26-Dashboard/Vendors/Sub Category.xlsx",
+   "source": "Nov.26-Dashboard/Vendors/Sub Category.xlsx",
+   "bytes": 12538,
+   "sha256": "1db64ed9e7119c4aed0cbecc00c4ad248ef3a30f9a03029c9a45d0c9308a98fe"
+  },
+  {
+   "path": "Oct1_TEFA-Funded-Participants - Data Request.xlsx",
+   "source": "Oct1_TEFA-Funded-Participants - Data\u00a0 Request.xlsx",
+   "bytes": 31045,
+   "sha256": "00963ad738258fba713c46dfb65af81a3a2b5c4eb15bd98090aa218717fffc87"
+  },
+  {
+   "path": "TEFA-Participating-Vendors.xlsx",
+   "source": "TEFA-Participating-Vendors.xlsx",
+   "bytes": 277754,
+   "sha256": "4d85999e3106b81f76acdfbe429dbdca74d2a6f41132dece86e2109fdf05169d"
+  },
+  {
+   "path": "TEFA_Data-Copy.xlsx",
+   "source": "TEFA_Data-Copy.xlsx",
+   "bytes": 130089,
+   "sha256": "8dd49c691159d657af80b00dd85b1a4b45b03c261ec95ffc13cbd0884dd00d4f"
+  },
+  {
+   "path": "TEFA_SpecialEd_Funding_by_Code_2026-27.xlsx",
+   "source": "TEFA_SpecialEd_Funding_by_Code_2026-27.xlsx",
+   "bytes": 281465,
+   "sha256": "715dc647a3c7b6438d0de52be22bfb4687173874a7a4fa6bb35898a857cd996d"
+  },
+  {
+   "path": "Voucher Data - July Release.xlsx",
+   "source": "Voucher Data - July Release.xlsx",
+   "bytes": 33406,
+   "sha256": "4b574747288f9778add27b53a372275531f264080ed90c0804067bfdd88a7ecb"
+  },
+  {
+   "path": "geo/PLANC2333.geojson",
+   "source": "Texas Shapefiles/planc2333_all_files_20260911/PLANC2333.zip",
+   "bytes": 373329,
+   "sha256": "f6e70c167731b13f37b8997d615ad6c4177c110bd49363ad1e49854037fc6ced"
+  },
+  {
+   "path": "geo/PLANC2333_meta.json",
+   "source": "Texas Shapefiles/planc2333_all_files_20260911/PLANC2333.zip",
+   "bytes": 179,
+   "sha256": "6dacde93f605c069d5c1b98e36f940142d449ba228fd064afafbdbd80f945b56"
+  },
+  {
+   "path": "geo/PLANC2333_isd_crosswalk.csv",
+   "source": "Texas Shapefiles/planc2333_all_files_20260911/PLANC2333_r160_ISDsSY25-26.xls",
+   "bytes": 50538,
+   "sha256": "c856e0bb4f992fe6954f94c6741230a99535b57eedb9797007b62357be8077c5"
+  },
+  {
+   "path": "geo/PLANH2316.geojson",
+   "source": "Texas Shapefiles/planh2316_all_files_20260911/PLANH2316.zip",
+   "bytes": 535907,
+   "sha256": "af81d868a20611087e6ddc9fbfb50514d98b1e5debce14a0c9128ce542df4f49"
+  },
+  {
+   "path": "geo/PLANH2316_meta.json",
+   "source": "Texas Shapefiles/planh2316_all_files_20260911/PLANH2316.zip",
+   "bytes": 179,
+   "sha256": "5b40269d30545006d2e0eda405101fab2a9e4be51aa7499f63d04016bb60bdbe"
+  },
+  {
+   "path": "geo/PLANH2316_isd_crosswalk.csv",
+   "source": "Texas Shapefiles/planh2316_all_files_20260911/PLANH2316_r160_ISDsSY25-26.xls",
+   "bytes": 62308,
+   "sha256": "49967a280abaed2ee986e064a25a94e8a8697afc5c15b5f8fe45087d20af1924"
+  },
+  {
+   "path": "geo/PLANS2168.geojson",
+   "source": "Texas Shapefiles/plans2168_all_files_20260911/PLANS2168.zip",
+   "bytes": 338131,
+   "sha256": "e79d4e050ff948dd462fdc18914b255f17958a407232f078bf3b6b3fc1c2559f"
+  },
+  {
+   "path": "geo/PLANS2168_meta.json",
+   "source": "Texas Shapefiles/plans2168_all_files_20260911/PLANS2168.zip",
+   "bytes": 179,
+   "sha256": "a43f686ac67afbcda2a44689f3b2690332b6966536dd16d569a4927d73391257"
+  },
+  {
+   "path": "geo/PLANS2168_isd_crosswalk.csv",
+   "source": "Texas Shapefiles/plans2168_all_files_20260911/PLANS2168_r160_ISDsSY25-26.xls",
+   "bytes": 50082,
+   "sha256": "5277a4bea8895c3bf60b0c69e8e5905ddf880c43ea1ac6d5545e5b3ce2ceca0a"
+  }
+ ]
+}

@@ -5,10 +5,12 @@ Accounts public data kept in the `TEFA Public Data` folder.
 
 ## Run it
 
+Python 3.13 (pinned in `.python-version`; 3.14 also works locally).
+
 Put this `tefa_viz` folder inside `TEFA Public Data` (the folder it reads by default), then:
 
 ```
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 streamlit run Home.py
 ```
 
@@ -18,6 +20,45 @@ On Windows you can also double-click `run_app.bat`. To read a different folder, 
 The legislative map reads Texas Legislative Council plan downloads from
 `EO Team/EO Data/Texas Shapefiles` (found automatically from the TEFA folder's location;
 override with `TEFA_SHAPE_DIR` or the **Shapefile folder** box).
+
+## Where the data comes from (live folders vs. bundled snapshot)
+
+The app looks for data in this order:
+
+1. `TEFA_DATA_DIR` / `TEFA_SHAPE_DIR`, or the sidebar boxes.
+2. The live folders on the shared drive (above), when they exist.
+3. The **bundled snapshot** in `data/`: copies of the files the loaders read, plus
+   pre-built map files in `data/geo/`. This is what a hosted copy reads. Set
+   `TEFA_USE_BUNDLE=1` to use it locally.
+
+`data/geo/` holds, per Legislative Council plan (House, Senate, Congressional):
+`PLAN####.geojson` (boundaries simplified to ~150 m, ~1 m coordinate precision),
+`PLAN####_isd_crosswalk.csv` (the parsed Red-160 school-district report) and a small
+`_meta.json`. With these the app needs neither geopandas nor xlrd, so hosting uses the
+slim `requirements.txt`; `requirements-dev.txt` adds what's needed to read the TLC
+downloads directly and to rebuild the bundle.
+
+**Refresh the snapshot** whenever new data lands (on a machine that sees the shared drive):
+
+```
+python scripts/build_bundle.py           # rebuild data/ (writes data/MANIFEST.json)
+python scripts/build_bundle.py --check   # is data/ up to date?
+pytest -q                                # includes bundle checks
+git add data && git commit -m "Refresh data bundle" && git push
+```
+
+`test_bundle_is_up_to_date` fails when the live files have changed since the last build,
+as a reminder. Don't edit `data/` by hand; the manifest's checksums are tested.
+
+## Hosting
+
+* Entry point `Home.py`, dependencies `requirements.txt`, Python **3.13**.
+  Streamlit Community Cloud doesn't read `.python-version`; pick 3.13 under
+  **Advanced settings** when deploying. Other hosts (Render, Hugging Face via Docker,
+  Azure) can use `.python-version` or their own setting.
+* With no shared drive present, the app falls back to `data/` automatically.
+* Before publishing outside the team: the sidebar **Data folder / Shapefile folder** boxes
+  let a visitor point the app at any path on the server; hide them in a hosted build.
 
 ## Layout
 
@@ -44,6 +85,8 @@ tefa/
   layers.py     the map's data layers (LAYERS registry) and an optional member-names hook
   charts.py     shared chart builders and the color palette
   ui.py         sidebar, caching, source captions, "Show data" + CSV download under each chart
+scripts/build_bundle.py snapshot the data + pre-build map files into data/
+data/                   bundled snapshot (generated; see below)
 tests/test_tefa.py
 ```
 
@@ -61,11 +104,12 @@ tests/test_tefa.py
 2. Check **Data & QA → files not read by any loader**.
 3. Add a release label in `config.py`, write loaders in `datasets.py` that emit the tidy
    schema, register them in `DATASETS`, and run `pytest -q`.
+4. Rebuild the bundle (`python scripts/build_bundle.py`) and commit `data/`.
 
 ## Legislative map
 
 * **Boundaries:** `PLANH2316.zip` (150 House districts) and `PLANS2168.zip` (31 Senate districts),
-  simplified to ~150 m and cached in `.cache/`. Dropping in a newer TLC plan download is picked up
+  simplified to ~150 m and cached in `.cache/` (or read pre-built from `data/geo/`). Dropping in a newer TLC plan download is picked up
   automatically (newest plan zip per chamber; a `PLANC####.zip` adds a Congressional option).
 * **Crosswalk:** `PLAN?####_r160_ISDsSY25-26.xls` lists every school district piece in each
   legislative district with 2020 Census total and under-18 population.
