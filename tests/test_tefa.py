@@ -299,3 +299,46 @@ def test_esc_regions():
     assert esc.website.str.startswith("https://").all()
     roster, _ = D.load("district_roster", BASE)
     assert set(roster.region.dropna().astype(int)) <= set(esc.region), "roster has regions the ESC file lacks"
+
+
+# ------------------------------------------------------------------ hosted path layout
+@needs_bundle
+def test_shallow_host_path_uses_bundled_maps(monkeypatch, tmp_path):
+    """Streamlit Cloud runs the app from /mount/src/<repo>: the folder above the app exists
+    but holds no shapefiles. The map must fall back to data/geo, not look in /mount/src."""
+    from tefa import geo
+    for v in ("TEFA_SHAPE_DIR", "TEFA_DATA_DIR", "TEFA_USE_BUNDLE", "TEFA_PUBLIC"):
+        monkeypatch.delenv(v, raising=False)
+    shallow = type(tmp_path)(tmp_path.anchor)  # an existing folder with no parents to climb (C:\ or /)
+    assert shallow.exists()
+    monkeypatch.setattr(config, "DEFAULT_DATA_DIR", shallow)
+    assert config.shape_dir() == config.BUNDLE_GEO_DIR
+    assert config.data_dir() == config.BUNDLE_DIR and config.public_mode()
+    assert {"H", "S", "C"} <= set(geo.find_plans(config.shape_dir()))
+
+
+# --------------------------------------------------------------------------- tooltips
+def _hovertemplates(at):
+    import json
+    for el in at.get("plotly_chart"):
+        spec = json.loads(el.proto.spec)
+        for t in spec.get("data", []):
+            if t.get("hovertemplate"):
+                yield t["hovertemplate"]
+
+
+@needs_bundle
+def test_tooltips_have_labels(monkeypatch):
+    """Blank Plotly Express labels collide and produce tooltips like '=NaN'."""
+    monkeypatch.setenv("TEFA_USE_BUNDLE", "1")
+    at = _app(monkeypatch, "1")
+    bad, n = {}, 0
+    for page in ["views/home.py", "views/participants.py", "views/districts.py", "views/spending.py",
+                 "views/vendors.py", "views/special_education.py", "views/legislative_map.py"]:
+        at.switch_page(page).run()
+        assert not at.exception, (page, at.exception)
+        for ht in _hovertemplates(at):
+            n += 1
+            if ht.startswith("=") or ">=" in ht or "<br>=" in ht:
+                bad.setdefault(page, []).append(ht)
+    assert n > 10 and not bad, bad

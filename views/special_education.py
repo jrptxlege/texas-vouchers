@@ -17,10 +17,12 @@ codes = ui.get("sped_by_code", base)
 if codes is not None:
     c = codes.sort_values("Median district").copy()
     c["label"] = c["Code"] + " · " + c["PEIMS instructional setting"].str.slice(0, 45)
-    fig = px.scatter(c, x="Median district", y="label", labels={"label": "", "Median district": ""},
-                     title="Add-on by code: lowest, median, highest district",
-                     hover_data={"Lowest district": ":$,.0f", "Highest district": ":$,.0f", "Median district": ":$,.0f"})
-    fig.update_traces(marker=dict(size=9, color=charts.PALETTE[0]),
+    fig = px.scatter(c, x="Median district", y="label", title="Add-on by code: lowest, median, highest district",
+                     custom_data=["Lowest district", "Highest district"])
+    charts.no_axis_titles(fig)
+    fig.update_traces(hovertemplate="<b>%{y}</b><br>Median district: %{x:$,.0f}<br>Lowest: %{customdata[0]:$,.0f}"
+                                    "<br>Highest: %{customdata[1]:$,.0f}<extra></extra>",
+                      marker=dict(size=9, color=charts.PALETTE[0]),
                       error_x=dict(type="data", symmetric=False, color=charts.MUTED, thickness=2, width=0,
                                    array=c["Highest district"] - c["Median district"],
                                    arrayminus=c["Median district"] - c["Lowest district"]))
@@ -38,7 +40,9 @@ if dt is not None:
     sel = dt[dt.district.isin(picks) & (dt.speech == speech)].sort_values("code")
     if len(sel):
         fig = px.bar(sel, x="code", y="addon", color="district", barmode="group",
-                     color_discrete_sequence=charts.PALETTE, labels={"code": "IEP instructional code", "addon": "", "district": ""})
+                     color_discrete_sequence=charts.PALETTE, labels={"code": "IEP instructional code"})
+        fig.update_traces(hovertemplate="%{fullData.name}<br>Code %{x}: %{y:$,.0f}<extra></extra>")
+        fig.update_yaxes(title_text=None)
         fig.update_xaxes(type="category")
         ui.chart(charts._style(fig, money=True), sel, key="sped_cmp")
 

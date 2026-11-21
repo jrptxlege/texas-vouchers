@@ -53,7 +53,11 @@ def live_shape_dir() -> Path:
     """EO Team/EO Data/Texas Shapefiles, found relative to the live TEFA data folder
     (…/EO Team/PubEd/Vouchers/TEFA Public Data)."""
     d = DEFAULT_DATA_DIR
-    return d.parents[2] / "EO Data" / "Texas Shapefiles" if len(d.parents) > 2 else d
+    # On a host the app sits at a shallow path (e.g. /mount/src/<repo>), so there is no
+    # EO Team folder to climb to. Return a path that won't exist rather than falling back
+    # to the app's parent folder, which does exist and would hide the bundled maps.
+    base = d.parents[2] if len(d.parents) > 2 else d
+    return base / "EO Data" / "Texas Shapefiles"
 
 
 def data_dir() -> Path:

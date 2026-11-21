@@ -56,8 +56,6 @@ fmt = ":$,.0f" if layer.kind == "money" else (":,.1f" if col == "per_1000_u18" e
 hover = {"district": False, "label": True, col: fmt, "pop_u18": ":,.0f"}
 if col != "value":
     hover["value"] = ":,.0f"
-if "member" in df:
-    hover["member"] = True
 
 t1, t2 = st.columns([1, 2])
 focus = t1.selectbox("Focus", list(charts.FOCUS))
@@ -65,7 +63,7 @@ basemap = t2.toggle("Street basemap (needs internet and WebGL)", value=False,
                     help="Off: district shapes drawn without map tiles; works offline, behind firewalls, and in exported images.")
 common = dict(geojson=_geo(plan), locations="district", color=col, color_continuous_scale=charts.SEQUENTIAL,
               hover_name="label", hover_data=hover,
-              labels={col: "", "value": "Total", "pop_u18": "Under-18 pop.", "member": "Member", "label": "District"})
+              labels={col: measure, "value": "Total", "pop_u18": "Under-18 pop.", "member": "Member", "label": "District"})
 if basemap:
     fig = px.choropleth_map(df, map_style="carto-positron", center={"lat": 31.2, "lon": -99.3},
                             zoom=4.6, opacity=0.8, **common)
@@ -73,11 +71,11 @@ if basemap:
     fig.update_layout(height=640, margin=dict(l=0, r=0, t=0, b=0),
                       coloraxis_colorbar=dict(title="", tickformat="$,.0f" if layer.kind == "money" else ",.0f"))
 else:
-    extra = {"value": "Total", "pop_u18": "Under-18 pop.", "member": "Member"}
+    extra = {"value": "Total", "pop_u18": "Under-18 pop."}  # member is already in the label
     if col == "value":
         extra.pop("value")
     fig = charts.district_map(_geo(plan), df, col, hover_cols=extra, money=layer.kind == "money",
-                              bounds=charts.FOCUS[focus])
+                              bounds=charts.FOCUS[focus], value_label=measure)
 st.plotly_chart(fig, width="stretch", key="map")
 src = "values as published by district" if layer.exact else f"crosswalk: {plan.crosswalk_source} (2020 Census)"
 st.caption(f"{layer.label} — {measure.lower()}. Districts without a value are blank. {layer.note} "

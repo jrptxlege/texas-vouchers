@@ -37,6 +37,15 @@ def _style(fig: go.Figure, height=420, money=False, pct=False) -> go.Figure:
     return fig
 
 
+def no_axis_titles(fig: go.Figure) -> go.Figure:
+    """Hide axis titles. Use this rather than labels={col: ""}: Plotly Express also uses
+    labels as tooltip names, and several blank labels collide, so tooltips lose fields and
+    show "=value" or "=NaN"."""
+    fig.update_xaxes(title_text=None)
+    fig.update_yaxes(title_text=None)
+    return fig
+
+
 def compare_bars(df: pd.DataFrame, color: str = "metric", title: str = "", pct=False, orientation="v") -> go.Figure:
     """Grouped bars of a tidy breakdown (category on the axis, `color` as series)."""
     d = df.copy()
@@ -50,8 +59,12 @@ def compare_bars(df: pd.DataFrame, color: str = "metric", title: str = "", pct=F
     fig = px.bar(d, x=x, y=y, color="series", barmode="group", orientation=orientation,
                  color_discrete_map=cmap, title=title,
                  category_orders={"series": C.RELEASE_ORDER + list(cmap)},
-                 labels={"value": "", "category": "", "series": ""},
-                 hover_data={"release": True, "series": True, "value": ":,.4~f" if pct else ":,.0f"})
+                 custom_data=["release"])
+    cat, val = ("x", "y") if orientation == "v" else ("y", "x")
+    rel = "" if color == "release" else "<br>%{customdata[0]}"
+    fig.update_traces(hovertemplate=f"<b>%{{{cat}}}</b><br>%{{fullData.name}}: "
+                                    f"%{{{val}:{'.1%' if pct else ',.0f'}}}{rel}<extra></extra>")
+    no_axis_titles(fig)
     if orientation == "h":
         fig.update_yaxes(autorange="reversed")
     return _style(fig, pct=pct)
@@ -62,18 +75,20 @@ def rate_bars(p: pd.DataFrame, title="Funded ÷ eligible") -> go.Figure:
     fig = px.bar(d, x="category", y="funded_rate", color="release", title=title,
                  color_discrete_map=RELEASE_COLORS, barmode="group",
                  category_orders={"release": C.RELEASE_ORDER},
-                 labels={"funded_rate": "", "category": "", "release": ""},
-                 hover_data={"eligible": ":,.0f", "funded": ":,.0f", "funded_rate": ":.1%"})
-    return _style(fig, pct=True)
+                 custom_data=["eligible", "funded"])
+    fig.update_traces(hovertemplate="<b>%{x}</b><br>%{fullData.name}<br>Funded ÷ eligible: %{y:.1%}"
+                                    "<br>Eligible: %{customdata[0]:,.0f}<br>Funded: %{customdata[1]:,.0f}<extra></extra>")
+    return _style(no_axis_titles(fig), pct=True)
 
 
 def hbar(df: pd.DataFrame, label: str, value: str, title="", money=False, n=None, color=PALETTE[0]) -> go.Figure:
     d = df.sort_values(value, ascending=False)
     if n:
         d = d.head(n)
-    fig = px.bar(d, x=value, y=label, orientation="h", title=title, labels={label: "", value: ""},
-                 hover_data={value: ":$,.0f" if money else ":,.0f"})
-    fig.update_traces(marker_color=color)
+    fig = px.bar(d, x=value, y=label, orientation="h", title=title)
+    fig.update_traces(marker_color=color,
+                      hovertemplate="%{y}: %{x:" + ("$,.0f" if money else ",.0f") + "}<extra></extra>")
+    no_axis_titles(fig)
     fig.update_yaxes(autorange="reversed")
     fig = _style(fig, height=max(300, 26 * len(d) + 80))
     if money:
@@ -101,7 +116,7 @@ def share_bar(df: pd.DataFrame, label: str, value: str, title="", money=False) -
 
 def district_map(geojson: dict, df: pd.DataFrame, col: str, label_col: str = "label",
                  hover_cols: dict | None = None, money: bool = False, height: int = 640,
-                 bounds: tuple | None = None) -> go.Figure:
+                 bounds: tuple | None = None, value_label: str = "") -> go.Figure:
     """Choropleth drawn as filled shapes on plain axes.
 
     Unlike Plotly's geo/map traces this needs no CDN topojson, map tiles, or WebGL, so it
@@ -137,7 +152,8 @@ def district_map(geojson: dict, df: pd.DataFrame, col: str, label_col: str = "la
         row = d.loc[did] if did in d.index else None
         lines = [f"<b>{row[label_col] if row is not None else did}</b>"]
         if v is not None and not pd.isna(v):
-            lines.append(f"${v:,.0f}" if money else (f"{v:,.1f}" if abs(v) < 100 else f"{v:,.0f}"))
+            txt = f"${v:,.0f}" if money else (f"{v:,.1f}" if abs(v) < 100 else f"{v:,.0f}")
+            lines.append(f"{value_label}: {txt}" if value_label else txt)
         else:
             lines.append("no value")
         if row is not None:

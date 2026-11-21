@@ -34,9 +34,10 @@ ui.chart(charts.hbar(cities, "city", "vendors", title="Top 20 Texas cities by ve
 
 monthly = f.dropna(subset=["created_at"]).set_index("created_at").resample("MS").size().rename("vendors").reset_index()
 monthly["cumulative"] = monthly.vendors.cumsum()
-fig = px.line(monthly, x="created_at", y="cumulative", labels={"created_at": "", "cumulative": ""},
-              title="Vendors registered (cumulative, by created_at)")
-fig.update_traces(line=dict(color=charts.PALETTE[0], width=2))
+fig = px.line(monthly, x="created_at", y="cumulative", title="Vendors registered (cumulative, by created_at)")
+fig.update_traces(line=dict(color=charts.PALETTE[0], width=2),
+                  hovertemplate="%{x|%b %Y}: %{y:,.0f} vendors registered<extra></extra>")
+charts.no_axis_titles(fig)
 ui.chart(charts._style(fig, height=320), monthly, key="vtime")
 
 with st.expander("Browse vendors"):
