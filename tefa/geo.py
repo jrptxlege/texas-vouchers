@@ -13,7 +13,7 @@ A Congressional layer appears automatically if a PLANC####.zip shapefile is adde
 Pre-built files (for hosting, where the TLC downloads aren't available): the same folder
 may instead hold, per plan, `PLANH####.geojson` (simplified WGS84 boundaries) and
 `PLANH####_isd_crosswalk.csv` (the parsed Red-160 report), written by
-scripts/build_bundle.py. Those need neither geopandas nor xlrd. If both a zip and
+scripts/build_bundle.py. Those need neither geopandas nor python-calamine. If both a zip and
 pre-built files exist for a chamber, the newer plan number wins (zip on a tie).
 """
 from __future__ import annotations
@@ -140,7 +140,8 @@ def read_r160(path: Path) -> pd.DataFrame:
     'Name ISD (37%)' with 'Total:' values and the next row with '<18:' values.
     The (%) is the share of that school district's population inside the legislative
     district (rounded) — we recompute exact shares from the population columns."""
-    raw = pd.read_excel(path, header=None)
+    # calamine reads legacy .xls; pandas is retiring its xlrd engine.
+    raw = pd.read_excel(path, header=None, engine="calamine")
     rows, dist, cur = [], None, None
     for r in raw.itertuples(index=False):
         c0, label, val = r[0], r[3], r[4]

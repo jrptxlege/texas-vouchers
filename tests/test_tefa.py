@@ -150,12 +150,12 @@ def test_bundle_files_match_manifest():
 
 @needs_bundle
 def test_bundle_runs_without_geo_libraries():
-    """What a hosted copy does: read data/ only, with geopandas/xlrd not installed."""
+    """What a hosted copy does: read data/ only, with geopandas/calamine not installed."""
     import subprocess
     import sys
     code = """
 import sys
-for m in ("geopandas", "xlrd", "pyogrio"):
+for m in ("geopandas", "python_calamine", "xlrd", "pyogrio"):
     sys.modules[m] = None
 from tefa import config as C, datasets as D, geo, layers
 assert C.data_dir() == C.BUNDLE_DIR and C.shape_dir() == C.BUNDLE_GEO_DIR

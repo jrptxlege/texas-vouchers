@@ -34,7 +34,7 @@ The app looks for data in this order:
 `data/geo/` holds, per Legislative Council plan (House, Senate, Congressional):
 `PLAN####.geojson` (boundaries simplified to ~150 m, ~1 m coordinate precision),
 `PLAN####_isd_crosswalk.csv` (the parsed Red-160 school-district report) and a small
-`_meta.json`. With these the app needs neither geopandas nor xlrd, so hosting uses the
+`_meta.json`. With these the app needs neither geopandas nor python-calamine (the .xls reader), so hosting uses the
 slim `requirements.txt`; `requirements-dev.txt` adds what's needed to read the TLC
 downloads directly and to rebuild the bundle.
 

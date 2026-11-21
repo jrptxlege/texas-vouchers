@@ -1,7 +1,7 @@
 # Local use on the shared drive: everything in requirements.txt, plus what's needed to
 # read the Legislative Council downloads directly and to rebuild the bundle.
 -r requirements.txt
-xlrd>=2.0,<3        # Legislative Council Red-160 .xls reports
+python-calamine>=0.3,<1   # Legislative Council Red-160 .xls reports
 geopandas>=1.0,<2   # PLANH/PLANS shapefiles
 pyogrio>=0.10
 pytest>=8.0

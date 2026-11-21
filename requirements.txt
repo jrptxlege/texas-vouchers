@@ -1,5 +1,5 @@
 # What the app needs to run, including when hosted (Streamlit Community Cloud etc.).
-# The hosted app reads the bundled snapshot in data/, so it needs no geopandas or xlrd.
+# The hosted app reads the bundled snapshot in data/, so it needs no geopandas or python-calamine.
 # Version ranges are the major versions this was tested with (Python 3.13 / 3.14).
 streamlit>=1.50,<2
 pandas>=3.0,<4

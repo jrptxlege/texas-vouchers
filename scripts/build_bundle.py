@@ -13,7 +13,7 @@ What it does
 2. Pre-builds the map: for each Texas Legislative Council plan (House, Senate,
    Congressional) it writes data/geo/PLAN####.geojson (boundaries simplified to ~150 m,
    coordinates rounded to ~1 m) and data/geo/PLAN####_isd_crosswalk.csv (the parsed
-   Red-160 school-district report). The hosted app then needs neither geopandas nor xlrd.
+   Red-160 school-district report). The hosted app then needs neither geopandas nor python-calamine.
 3. Writes data/MANIFEST.json: every bundled file with its source, size and SHA-256.
 
 Needs the full local requirements (requirements-dev.txt), since it reads the shapefiles.
