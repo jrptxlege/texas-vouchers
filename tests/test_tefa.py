@@ -227,3 +227,38 @@ def test_staff_mode_keeps_tools(monkeypatch):
     assert "Data folder" in [t.label for t in at.text_input]
     at.switch_page("views/data_qa.py").run()
     assert not at.exception
+
+
+def _page_text(at) -> str:
+    parts = []
+    for kind in ("markdown", "caption", "warning", "info", "error", "expander", "title", "subheader"):
+        for el in getattr(at, kind, []):
+            parts.append(str(getattr(el, "value", "") or getattr(el, "label", "")))
+    return "\n".join(parts)
+
+
+DEV_MARKERS = ("tefa/", ".py", "ALIASES", "CITY_COUNTY", "worth checking", "not matched to the roster")
+
+
+@needs_data
+@needs_shapes
+@pytest.mark.parametrize("public, expect_dev", [("1", False), ("0", True)])
+def test_developer_notes_only_in_staff_mode(monkeypatch, public, expect_dev):
+    at = _app(monkeypatch, public)
+    found = {}
+    pages = ["views/home.py", "views/participants.py", "views/districts.py", "views/spending.py",
+             "views/vendors.py", "views/special_education.py", "views/legislative_map.py"]
+    for page in pages:
+        at.switch_page(page).run()
+        assert not at.exception, (page, at.exception)
+        texts = [_page_text(at)]
+        if page.endswith("legislative_map.py"):  # estimated layer: shows the "names not placed" popover
+            at.selectbox[0].set_value("july_funded").run()
+            texts.append(_page_text(at))
+        hits = [m for m in DEV_MARKERS if any(m in t for t in texts)]
+        if hits:
+            found[page] = hits
+    if expect_dev:
+        assert "views/districts.py" in found and "views/legislative_map.py" in found, found
+    else:
+        assert not found, f"developer notes visible in public mode: {found}"

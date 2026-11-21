@@ -2,7 +2,7 @@
 import plotly.express as px
 import streamlit as st
 
-from tefa import charts, districts, ui
+from tefa import charts, config as C, districts, ui
 
 st.set_page_config(page_title="Districts · TEFA", layout="wide")
 base = ui.base_dir()
@@ -46,8 +46,10 @@ ui.chart(fig, show[["district", "county", "region", "district_type", "value", "s
 
 flag = d[d.per_1000_students > 200]
 if len(flag):
+    why = ("which likely reflects how the source assigns participants to districts"
+           if C.public_mode() else "likely an attribution or name-matching issue worth checking")
     st.warning(f"{len(flag)} district(s) show more than 200 participants per 1,000 enrolled students — "
-               "likely an attribution or name-matching issue worth checking: "
+               f"{why}: "
                + ", ".join(f"{r.district} ({r.value:,.0f} vs {r.student_count:,.0f} enrolled)" for r in flag.itertuples()))
 
 st.subheader("By education service center region")
@@ -61,7 +63,7 @@ ui.chart(charts._style(fig, height=340), reg, key="region",
          alt="Totals for listed districts only; unlisted (suppressed or non-top-30) districts are not included.")
 
 ui.source("july_district", "oct1_district", "nov_isd", "oct_district_prior_public", "district_roster")
-if len(unmatched):
+if len(unmatched) and not C.public_mode():  # internal name-matching QA (staff only)
     with st.expander(f"{len(unmatched)} district names not matched to the roster"):
         st.dataframe(unmatched, hide_index=True)
         st.caption("Add spellings to ALIASES or CITY_COUNTY in tefa/districts.py.")

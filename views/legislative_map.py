@@ -4,7 +4,7 @@ from pathlib import Path
 import plotly.express as px
 import streamlit as st
 
-from tefa import charts, geo, layers, ui
+from tefa import charts, config as C, geo, layers, ui
 
 st.set_page_config(page_title="Legislative map · TEFA", layout="wide")
 base = ui.base_dir()
@@ -92,8 +92,8 @@ if diag.get("unplaced"):
     m3.metric("Published with no district", f"${diag['unplaced']:,.0f}" if layer.kind == "money" else f"{diag['unplaced']:,.0f}")
 elif diag.get("unmatched"):
     with m3.popover(f"{len(diag['unmatched'])} source names not placed"):
-        st.write("Mostly non-geographic entities (county departments, university schools, charters). "
-                 "Spelling fixes go in tefa/districts.py.")
+        st.write("Mostly non-geographic entities (county departments, university schools, charters)."
+                 + ("" if C.public_mode() else " Spelling fixes go in tefa/districts.py."))
         st.dataframe({"name": diag["unmatched"]}, hide_index=True)
 
 st.subheader("Ranked")
