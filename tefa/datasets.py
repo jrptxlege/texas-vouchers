@@ -366,6 +366,48 @@ def district_roster(base: Path) -> pd.DataFrame:
     return df
 
 
+# ================================================================ ESC regions
+def esc_file(base: Path) -> Path:
+    """Newest ESC####.csv: the bundled copy (data/geo) if present, else the shapefile folder
+    (EO Data/Texas Shapefiles). It is a TEA/ESC GIS layer's attribute table: region,
+    headquarters city and website for the 20 education service centers."""
+    import re as _re
+    for d in (base / "geo", C.shape_dir()):
+        hits = sorted((p for p in d.glob("ESC*.csv") if _re.fullmatch(r"ESC\d{4}\.csv", p.name, _re.I)),
+                      key=lambda p: p.stem) if d.exists() else []
+        if hits:
+            return hits[-1]
+    raise FileNotFoundError("ESC####.csv (in data/geo or the shapefile folder)")
+
+
+def esc_regions(base: Path) -> pd.DataFrame:
+    """region (int 1-20), hq_city, website, label ("Region 4 · Houston"). GIS area/length
+    columns are dropped (their units aren't documented in the export)."""
+    p = esc_file(base)
+    df = pd.read_csv(p)
+    df.columns = [c.strip().upper() for c in df.columns]
+    out = pd.DataFrame({"region": pd.to_numeric(df["ESC_REGION"], errors="coerce").astype("Int64"),
+                        "hq_city": df["CITY"].astype(str).str.strip(),
+                        "website": df["WEBSITE"].astype(str).str.strip()})
+    out = out.dropna(subset=["region"]).sort_values("region").reset_index(drop=True)
+    out["website"] = out.website.map(lambda w: w if w.startswith("http") else f"https://{w}")
+    out["label"] = "Region " + out.region.astype(str) + " · " + out.hq_city
+    out.attrs["source"] = p.name
+    return out
+
+
+def region_label(region, esc: pd.DataFrame | None) -> str:
+    """'Region 4 · Houston' (falls back to 'Region 4' if the ESC table is unavailable)."""
+    if region is None or pd.isna(region):
+        return "No region"
+    r = int(region)
+    if esc is not None:
+        hit = esc.loc[esc.region == r, "label"]
+        if len(hit):
+            return hit.iloc[0]
+    return f"Region {r}"
+
+
 # ============================================================ vendors & special ed
 def vendor_directory(base: Path) -> pd.DataFrame:
     df = pd.read_excel(_need(base, "TEFA-Participating-Vendors.xlsx"))
@@ -476,6 +518,8 @@ DATASETS: list[Dataset] = [
             "Districts under 30 participants are not listed."),
     Dataset("district_roster", "District roster with enrollment", "Reference", district_roster, "TEFA_Data-Copy.xlsx / gsheet_2025",
             "-999 enrollment values treated as missing."),
+    Dataset("esc_regions", "Education service center regions", "Reference", esc_regions, "ESC2024.csv",
+            "Region number, headquarters city and website (Texas Shapefiles folder)."),
     Dataset("vendor_directory", "Participating vendor directory", "Reference", vendor_directory, "TEFA-Participating-Vendors.xlsx"),
     Dataset("sped_by_code", "SPED add-on by IEP instructional code", "Special education", sped_by_code, "TEFA_SpecialEd_Funding_by_Code_2026-27.xlsx"),
     Dataset("sped_district_table", "SPED add-on by district and code", "Special education", sped_district_table, "TEFA_SpecialEd_Funding_by_Code_2026-27.xlsx"),

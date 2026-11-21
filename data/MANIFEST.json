@@ -1,5 +1,5 @@
 {
- "built": "2026-11-21T07:18:06-06:00",
+ "built": "2026-11-21T08:04:39-06:00",
  "source_data_dir": "TEFA Public Data",
  "source_shape_dir": "Texas Shapefiles",
  "plans": {
@@ -44,7 +44,8 @@
   "TEFA-Participating-Vendors.xlsx": "4d85999e3106b81f76acdfbe429dbdca74d2a6f41132dece86e2109fdf05169d",
   "TEFA_Data-Copy.xlsx": "8dd49c691159d657af80b00dd85b1a4b45b03c261ec95ffc13cbd0884dd00d4f",
   "TEFA_SpecialEd_Funding_by_Code_2026-27.xlsx": "715dc647a3c7b6438d0de52be22bfb4687173874a7a4fa6bb35898a857cd996d",
-  "Voucher Data - July Release.xlsx": "4b574747288f9778add27b53a372275531f264080ed90c0804067bfdd88a7ecb"
+  "Voucher Data - July Release.xlsx": "4b574747288f9778add27b53a372275531f264080ed90c0804067bfdd88a7ecb",
+  "Texas Shapefiles/ESC2024.csv": "d436bbbd7b0e1f87963182b7b43bd093ad9fceac64be4c17a39eb8a3b56a8e67"
  },
  "files": [
   {
@@ -322,6 +323,12 @@
    "source": "Texas Shapefiles/plans2168_all_files_20260911/PLANS2168_r160_ISDsSY25-26.xls",
    "bytes": 50082,
    "sha256": "5277a4bea8895c3bf60b0c69e8e5905ddf880c43ea1ac6d5545e5b3ce2ceca0a"
+  },
+  {
+   "path": "geo/ESC2024.csv",
+   "source": "Texas Shapefiles/ESC2024.csv",
+   "bytes": 1881,
+   "sha256": "d436bbbd7b0e1f87963182b7b43bd093ad9fceac64be4c17a39eb8a3b56a8e67"
   }
  ]
 }

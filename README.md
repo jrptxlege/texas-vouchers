@@ -34,7 +34,9 @@ The app looks for data in this order:
 `data/geo/` holds, per Legislative Council plan (House, Senate, Congressional):
 `PLAN####.geojson` (boundaries simplified to ~150 m, ~1 m coordinate precision),
 `PLAN####_isd_crosswalk.csv` (the parsed Red-160 school-district report) and a small
-`_meta.json`. With these the app needs neither geopandas nor python-calamine (the .xls reader), so hosting uses the
+`_meta.json`; plus the newest `ESC####.csv` from the shapefile folder (education service
+center regions: number, headquarters city, website), used to label regions as
+"Region 4 · Houston". With these the app needs neither geopandas nor python-calamine (the .xls reader), so hosting uses the
 slim `requirements.txt`; `requirements-dev.txt` adds what's needed to read the TLC
 downloads directly and to rebuild the bundle.
 
@@ -74,7 +76,7 @@ views/
   home.py               headline numbers + application funnel (Nov dashboard)
   participants.py       any breakdown (tier, income, grade, age, gender, race, ...), eligible vs funded,
                         funded ÷ eligible, and cross-release comparisons
-  districts.py          district counts and per-1,000-enrolled rates, ESC-region rollup
+  districts.py          district counts and per-1,000-enrolled rates, ESC-region rollup (labelled with HQ city)
   spending.py           school funding vs marketplace; schools, categories, vendors
   vendors.py            participating-vendor directory (type, city, registrations over time)
   special_education.py  add-on by IEP code; district comparison

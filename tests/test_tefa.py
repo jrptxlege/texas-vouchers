@@ -262,3 +262,20 @@ def test_developer_notes_only_in_staff_mode(monkeypatch, public, expect_dev):
         assert "views/districts.py" in found and "views/legislative_map.py" in found, found
     else:
         assert not found, f"developer notes visible in public mode: {found}"
+
+
+# ---------------------------------------------------------------------- ESC regions
+def test_region_label_fallback():
+    assert D.region_label(4, None) == "Region 4"
+    assert D.region_label(float("nan"), None) == "No region"
+
+
+@needs_data
+def test_esc_regions():
+    esc, err = D.load("esc_regions", BASE)
+    assert err is None, err
+    assert list(esc.region) == list(range(1, 21))
+    assert D.region_label(4, esc) == "Region 4 · Houston"
+    assert esc.website.str.startswith("https://").all()
+    roster, _ = D.load("district_roster", BASE)
+    assert set(roster.region.dropna().astype(int)) <= set(esc.region), "roster has regions the ESC file lacks"
