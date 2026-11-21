@@ -30,7 +30,26 @@ def _path_box(label: str, store: str, default: str, help: str) -> str:
     return st.session_state[store]
 
 
+def _snapshot_note(base: Path):
+    """Public mode: one quiet line saying which data the app is showing."""
+    import json
+    mf = base / "MANIFEST.json"
+    built = ""
+    if mf.exists():
+        try:
+            built = json.loads(mf.read_text(encoding="utf-8")).get("built", "")[:10]
+        except (OSError, ValueError):
+            pass
+    st.sidebar.caption(f"Data: TEFA public files{f', snapshot of {built}' if built else ''}.")
+
+
 def base_dir() -> Path:
+    """Data folder. In public mode it is fixed (config / environment) and not editable:
+    a hosted visitor must not be able to point the app at other paths on the server."""
+    if C.public_mode():
+        base = C.data_dir()
+        _snapshot_note(base)
+        return base
     path = _path_box("Data folder", "_data_dir", str(C.data_dir()),
                      "Folder holding the TEFA public files (defaults to the folder above this app).")
     if st.sidebar.button("Reload data"):
@@ -39,6 +58,8 @@ def base_dir() -> Path:
 
 
 def shape_dir() -> Path:
+    if C.public_mode():
+        return C.shape_dir()
     return Path(_path_box("Shapefile folder", "_shape_dir", str(C.shape_dir()),
                           "Folder with Texas Legislative Council plan downloads (PLANH####.zip, PLANS####.zip)."))
 

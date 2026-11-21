@@ -57,25 +57,32 @@ as a reminder. Don't edit `data/` by hand; the manifest's checksums are tested.
   **Advanced settings** when deploying. Other hosts (Render, Hugging Face via Docker,
   Azure) can use `.python-version` or their own setting.
 * With no shared drive present, the app falls back to `data/` automatically.
-* Before publishing outside the team: the sidebar **Data folder / Shapefile folder** boxes
-  let a visitor point the app at any path on the server; hide them in a hosted build.
+* **Public mode** (what a hosted copy runs in): the sidebar **Data folder / Shapefile folder**
+  boxes and **Reload data** are not shown, so visitors can't point the app at other paths on
+  the server; the sidebar just notes the snapshot date. The **Data & QA** page isn't
+  registered, so it has no menu entry and its URL goes to Home.
+  It is **on automatically** whenever the shared drive isn't reachable (or `TEFA_USE_BUNDLE=1`),
+  so a host needs no setting. Override with `TEFA_PUBLIC=1` (preview the public version
+  locally) or `TEFA_PUBLIC=0` (staff tools on a private host). On Streamlit Community Cloud,
+  a root-level secret `TEFA_PUBLIC = "0"` is passed as that environment variable.
 
 ## Layout
 
 ```
-Home.py                 headline numbers + application funnel (Nov dashboard)
-pages/
-  1_Participants.py     any breakdown (tier, income, grade, age, gender, race, ...), eligible vs funded,
+Home.py                 entry point: page router (st.navigation); decides which pages exist
+views/
+  home.py               headline numbers + application funnel (Nov dashboard)
+  participants.py       any breakdown (tier, income, grade, age, gender, race, ...), eligible vs funded,
                         funded ÷ eligible, and cross-release comparisons
-  2_Districts.py        district counts and per-1,000-enrolled rates, ESC-region rollup
-  3_Spending.py         school funding vs marketplace; schools, categories, vendors
-  4_Vendors.py          participating-vendor directory (type, city, registrations over time)
-  5_Special_Education_Funding.py   add-on by IEP code; district comparison
-  6_Data_and_QA.py      dataset inventory, files with no loader, cross-file checks
-  7_Legislative_Map.py  House/Senate choropleth with toggleable data layers, metro focus,
+  districts.py          district counts and per-1,000-enrolled rates, ESC-region rollup
+  spending.py           school funding vs marketplace; schools, categories, vendors
+  vendors.py            participating-vendor directory (type, city, registrations over time)
+  special_education.py  add-on by IEP code; district comparison
+  data_qa.py            dataset inventory, files with no loader, cross-file checks (staff only)
+  legislative_map.py    House/Senate choropleth with toggleable data layers, metro focus,
                         ranked districts, and the school districts inside each legislative district
 tefa/
-  config.py     data folder, release labels
+  config.py     data folder, bundle fallback, public mode, release labels
   readers.py    format-tolerant readers (UTF-16 Tableau CSVs, "$1,234" strings, 1x1 KPI sheets, crosstabs)
   datasets.py   one loader per published table + the DATASETS registry
   districts.py  district-name matching across releases, joined to enrollment

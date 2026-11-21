@@ -188,3 +188,42 @@ def test_bundle_is_up_to_date():
     bb = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(bb)
     assert bb.check(config.DEFAULT_DATA_DIR) == [], "Bundle is stale - run: python scripts/build_bundle.py"
+
+
+# ------------------------------------------------------------- public (hosted) mode
+def test_public_mode_flag(monkeypatch):
+    monkeypatch.setenv("TEFA_PUBLIC", "1")
+    assert config.public_mode()
+    monkeypatch.setenv("TEFA_PUBLIC", "0")
+    assert not config.public_mode()
+    monkeypatch.delenv("TEFA_PUBLIC")
+    monkeypatch.setenv("TEFA_USE_BUNDLE", "1")
+    assert config.public_mode(), "running from the bundle (as a host does) must default to public"
+
+
+def _app(monkeypatch, public: str):
+    from streamlit.testing.v1 import AppTest
+    monkeypatch.setenv("TEFA_PUBLIC", public)
+    at = AppTest.from_file(str(config.APP_DIR / "Home.py"), default_timeout=300)
+    at.run()
+    assert not at.exception, at.exception
+    return at
+
+
+@needs_data
+def test_public_mode_locks_sidebar_and_hides_qa(monkeypatch):
+    at = _app(monkeypatch, "1")
+    assert [t.label for t in at.text_input] == [], "folder boxes must not render in public mode"
+    assert "Reload data" not in [b.label for b in at.button]
+    with pytest.raises(ValueError):  # page not registered: no menu entry, no URL
+        at.switch_page("views/data_qa.py")
+    at.switch_page("views/legislative_map.py").run()
+    assert not at.exception and [t.label for t in at.text_input] == []
+
+
+@needs_data
+def test_staff_mode_keeps_tools(monkeypatch):
+    at = _app(monkeypatch, "0")
+    assert "Data folder" in [t.label for t in at.text_input]
+    at.switch_page("views/data_qa.py").run()
+    assert not at.exception

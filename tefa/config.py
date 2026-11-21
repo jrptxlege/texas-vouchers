@@ -23,6 +23,32 @@ def use_bundle() -> bool:
     return os.environ.get("TEFA_USE_BUNDLE", "").strip().lower() in {"1", "true", "yes"}
 
 
+def _env_flag(name: str) -> bool | None:
+    v = os.environ.get(name, "").strip().lower()
+    if v in {"1", "true", "yes", "on"}:
+        return True
+    if v in {"0", "false", "no", "off"}:
+        return False
+    return None
+
+
+def live_data_available() -> bool:
+    """True when the shared-drive TEFA folder is reachable (never the case on a host)."""
+    return (DEFAULT_DATA_DIR / NOV_DIR).exists()
+
+
+def public_mode() -> bool:
+    """Public (hosted) mode: sidebar folder boxes and the Data & QA page are not shown.
+
+    On by default whenever the shared drive isn't reachable or the bundle is forced, so a
+    hosted copy is locked down without any setting. TEFA_PUBLIC=1 forces it on (e.g. to
+    preview the public version locally); TEFA_PUBLIC=0 forces it off."""
+    flag = _env_flag("TEFA_PUBLIC")
+    if flag is not None:
+        return flag
+    return use_bundle() or not live_data_available()
+
+
 def live_shape_dir() -> Path:
     """EO Team/EO Data/Texas Shapefiles, found relative to the live TEFA data folder
     (…/EO Team/PubEd/Vouchers/TEFA Public Data)."""
@@ -34,7 +60,7 @@ def data_dir() -> Path:
     env = os.environ.get("TEFA_DATA_DIR")
     if env:
         return Path(env).expanduser()
-    if not use_bundle() and (DEFAULT_DATA_DIR / NOV_DIR).exists():
+    if not use_bundle() and live_data_available():
         return DEFAULT_DATA_DIR
     return BUNDLE_DIR
 

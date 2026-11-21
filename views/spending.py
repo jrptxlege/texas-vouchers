@@ -1,7 +1,7 @@
 """Where TEFA money goes: school tuition vs. marketplace purchases."""
 import streamlit as st
 
-from tefa import charts, ui
+from tefa import config as C, charts, ui
 
 st.set_page_config(page_title="Spending · TEFA", layout="wide")
 base = ui.base_dir()
@@ -45,7 +45,7 @@ with tab_m:
         ui.chart(charts.hbar(ven, "vendor", "expenditure", money=True, n=n, title="Expenditure by vendor (full list)"),
                  ven.sort_values("expenditure", ascending=False), key="vendors",
                  alt="The dashboard's Top-20 vendor export reports different amounts for its first 10 vendors "
-                     "than this full list — see Data & QA.")
+                     "than this full list" + ("." if C.public_mode() else " — see Data & QA."))
     dist = ui.get("nov_vendor_distribution", base)
     if dist is not None:
         ui.chart(charts.hbar(dist, "range", "vendors", title="Vendors by total expenditure range"), dist, key="vdist")

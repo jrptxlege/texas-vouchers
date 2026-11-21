@@ -1,59 +1,28 @@
-"""TEFA public data explorer — home page.
+"""TEFA public data explorer — entry point and page router.
 
 Run:  streamlit run Home.py
+
+Pages live in views/. They are registered here with st.navigation, so a page that
+isn't registered has no menu entry and no URL. In public (hosted) mode the Data & QA
+page is not registered; see tefa.config.public_mode().
 """
-import pandas as pd
-import plotly.graph_objects as go
 import streamlit as st
 
-from tefa import charts, ui
+from tefa import config as C
 
 st.set_page_config(page_title="TEFA Data Explorer", layout="wide")
-base = ui.base_dir()
 
-st.title("TEFA public data explorer")
-st.write("Texas Education Freedom Accounts — applications, participants, and spending "
-         "from the July release, the Oct 1 data request, and the Nov 2026 public dashboard.")
+pages = [
+    st.Page("views/home.py", title="Home", default=True),
+    st.Page("views/participants.py", title="Participants", url_path="Participants"),
+    st.Page("views/districts.py", title="Districts", url_path="Districts"),
+    st.Page("views/spending.py", title="Spending", url_path="Spending"),
+    st.Page("views/vendors.py", title="Vendors", url_path="Vendors"),
+    st.Page("views/special_education.py", title="Special Education Funding", url_path="Special_Education_Funding"),
+    st.Page("views/legislative_map.py", title="Legislative Map", url_path="Legislative_Map"),
+]
+if not C.public_mode():
+    # Internal: file inventory and cross-file reconciliation (staff only).
+    pages.insert(6, st.Page("views/data_qa.py", title="Data and QA", url_path="Data_and_QA"))
 
-k = ui.get("nov_kpis", base)
-if k is None:
-    st.stop()
-if k.value.isna().all():
-    st.error(f"No headline files found under {base}. Check the **Data folder** in the sidebar.")
-    st.stop()
-kv = dict(zip(k.kpi, k.value, strict=True))
-
-st.subheader("Nov 2026 dashboard: headline numbers")
-c = st.columns(4)
-c[0].metric("Applications received", ui.fmt_int(kv.get("Applications received")))
-c[1].metric("Eligible applicants", ui.fmt_int(kv.get("Eligible applicants")))
-c[2].metric("Funded participants", ui.fmt_int(kv.get("Funded participants")))
-c[3].metric("On waiting list", ui.fmt_int(kv.get("On waiting list")))
-c = st.columns(4)
-spend = kv.get("Total program expenditure ($)")
-c[0].metric("Total expenditure", "—" if pd.isna(spend) else f"${spend / 1e6:,.1f}M")
-c[1].metric("Participating schools", ui.fmt_int(kv.get("Participating schools")))
-c[2].metric("Vendors with spending", ui.fmt_int(kv.get("Vendors (with spending)")))
-share = kv.get("Share of participants with a disability")
-c[3].metric("Participants with a disability", "—" if pd.isna(share) else f"{share:.1%}")
-
-# Funnel: where eligible applicants ended up
-stages = pd.DataFrame({
-    "stage": ["Applications received", "Eligible applicants", "Funded participants", "On waiting list", "Opted out"],
-    "value": [kv.get(s) for s in ["Applications received", "Eligible applicants", "Funded participants", "On waiting list", "Opted out"]],
-})
-fig = go.Figure(go.Bar(x=stages.value, y=stages.stage, orientation="h", marker_color=charts.PALETTE[0],
-                       text=[ui.fmt_int(v) for v in stages.value], textposition="outside",
-                       hovertemplate="%{y}: %{x:,.0f}<extra></extra>"))
-fig.update_yaxes(autorange="reversed")
-fig = charts._style(fig, height=300)
-fig.update_xaxes(range=[0, (stages.value.max() or 1) * 1.12])  # room for end labels
-fig.update_layout(title="Application funnel")
-gap = stages.value.iloc[1] - stages.value.iloc[2:].sum()
-ui.chart(fig, stages, key="funnel",
-         alt=f"Funded + waiting list + opted out leaves {gap:,.0f} eligible applicants unaccounted for "
-             "in the published tiles (see Data & QA).")
-ui.source("nov_kpis")
-
-st.info("Use the pages in the sidebar: **Participants** (who is funded), **Districts**, **Spending**, "
-        "**Vendors**, **Special education funding**, and **Data & QA** (file inventory and cross-file checks).")
+st.navigation(pages).run()
