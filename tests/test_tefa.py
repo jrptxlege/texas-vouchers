@@ -85,6 +85,26 @@ def test_layers_build():
         assert len(df) == 31 and df.value.notna().any(), l.id
     df, diag = layers.build("july_funded", BASE, plan)
     assert diag["share_of_total_allocated"] > 0.98
+    # Only non-geographic entities (no boundaries) should fail to match the crosswalk.
+    _, diag = layers.build("oct1_funded", BASE, plan)
+    assert diag["unmatched"] == ["HARRIS COUNTY DEPT OF ED"], diag["unmatched"]
+
+
+@pytest.mark.skipif(not (config.live_shape_dir().exists() and (config.BUNDLE_GEO_DIR).exists()),
+                    reason="needs both the shapefile folder and the bundled data/geo")
+def test_bundled_map_files_match_live():
+    """The pre-built geojson/crosswalk in data/geo must equal what the shapefiles produce."""
+    import pandas as pd
+    from tefa import geo
+    live, bund = geo.find_plans(config.live_shape_dir()), geo.find_plans(config.BUNDLE_GEO_DIR)
+    assert live["H"].shapefile_zip is not None, "live folder should hold the TLC zips"
+    for ch, n in [("H", 150), ("S", 31), ("C", 38)]:
+        assert live[ch].name == bund[ch].name and bund[ch].geojson is not None
+        ids = sorted(f["id"] for f in geo.boundaries_geojson(bund[ch])["features"])
+        assert ids == list(range(1, n + 1)), ch
+        assert ids == sorted(f["id"] for f in geo.boundaries_geojson(live[ch])["features"])
+        pd.testing.assert_frame_equal(geo.crosswalk(live[ch]).reset_index(drop=True),
+                                      geo.crosswalk(bund[ch]).reset_index(drop=True), check_dtype=False)
 
 
 @needs_data

@@ -18,6 +18,8 @@ from . import datasets as D
 # Name variants -> roster spelling (after basic cleanup). Extend as unmatched names show up.
 ALIASES = {
     "BEN BOLT PALITO": "BEN BOLT PALITO BLANCO ISD",  # truncated in the SPED funding table
+    "GOLDTHWAITE CONS ISD": "GOLDTHWAITE ISD",        # TLC Red-160 spelling; TEA roster says ISD
+    "SAND S CONS ISD": "SANDS CONS ISD",              # Oct 1 workbook splits "SANDS CISD"
 }
 
 # Twenty-two roster districts share a name with another district. Files tell them apart
